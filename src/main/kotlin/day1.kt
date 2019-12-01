@@ -5,15 +5,15 @@ fun fuelForMass(mass: Int): Int =
     )
 
 fun fuelForMassAndFuel(mass: Int): Int =
-    generateSequence(mass, ::fuelForMass)
+    generateSequence(mass) { fuelForMass(it) }
         .drop(1)
         .takeWhile { it > 0 }
         .sum()
 
 fun main() {
     val masses = listOfMasses()
-    println("fuel for just module mass: ${masses.sumBy(::fuelForMass)}")
-    println("fuel for modules and fuel mass: ${masses.sumBy(::fuelForMassAndFuel)}")
+    println("fuel for just module mass: ${masses.sumBy { fuelForMass(it) }}")
+    println("fuel for modules and fuel mass: ${masses.sumBy { fuelForMassAndFuel(it) }}")
 }
 
-fun listOfMasses(): List<Int> = readLinesFromFile("day1.txt").map(String::toInt)
+fun listOfMasses(): List<Int> = readLinesFromFile("day1.txt").map { it.toInt() }
