@@ -1,4 +1,3 @@
-
 fun fuelForMass(mass: Int): Int =
     maxOf(
         (mass / 3) - 2,
@@ -7,8 +6,8 @@ fun fuelForMass(mass: Int): Int =
 
 fun fuelForMassAndFuel(mass: Int): Int =
     generateSequence(mass, ::fuelForMass)
-        .takeWhile { it > 0 }
         .drop(1)
+        .takeWhile { it > 0 }
         .sum()
 
 fun main() {
@@ -17,6 +16,4 @@ fun main() {
     println("fuel for modules and fuel mass: ${masses.sumBy(::fuelForMassAndFuel)}")
 }
 
-fun listOfMasses(): List<Int> =
-    readLinesFromFile("day1.txt")
-        .map(String::toInt)
+fun listOfMasses(): List<Int> = readLinesFromFile("day1.txt").map(String::toInt)
