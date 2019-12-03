@@ -28,11 +28,8 @@ fun nearestManhattanDistance(intersections: List<CoOrdinate>) =
         .min()
 
 
-fun findIntersections(
-    wire1: List<CoOrdinate>,
-    wire2: List<CoOrdinate>
-) = wire1.intersect(wire2)
-    .filter { !it.isOrigin() }
+fun findIntersections(wire1: List<CoOrdinate>, wire2: List<CoOrdinate>) =
+    wire1.intersect(wire2).filter { !it.isOrigin() }
 
 fun buildWire(firstInstruction: List<MoveInstruction>) : List<CoOrdinate> =
     firstInstruction.fold(listOf(theOrigin)) {
