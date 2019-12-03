@@ -1,4 +1,4 @@
-import coOrdinates.CoOrdinate
+import coOrdinates.Coordinate
 import coOrdinates.MoveInstruction
 import coOrdinates.theOrigin
 import coOrdinates.toMoveInstruction
@@ -22,16 +22,16 @@ fun main () {
 
 
 
-fun nearestManhattanDistance(intersections: List<CoOrdinate>) =
+fun nearestManhattanDistance(intersections: List<Coordinate>) =
     intersections
         .map { it.manhattanDistanceTo(theOrigin) }
         .min()
 
 
-fun findIntersections(wire1: List<CoOrdinate>, wire2: List<CoOrdinate>) =
+fun findIntersections(wire1: List<Coordinate>, wire2: List<Coordinate>) =
     wire1.intersect(wire2).filter { !it.isOrigin() }
 
-fun buildWire(firstInstruction: List<MoveInstruction>) : List<CoOrdinate> =
+fun buildWire(firstInstruction: List<MoveInstruction>) : List<Coordinate> =
     firstInstruction.fold(listOf(theOrigin)) {
             wireSoFar, moveInstruction -> wireSoFar.plus(wireSoFar.last().coordsInDirection(moveInstruction))
     }
