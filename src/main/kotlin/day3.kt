@@ -4,10 +4,10 @@ import coOrdinates.theOrigin
 import coOrdinates.toMoveInstruction
 
 fun main () {
-    val (firstInstructions, secondInstructions) = getWireInstructions()
+    val (moveInstructions1, moveInstructions2) = getWireInstructions()
 
-    val wire1 = buildWire(firstInstructions)
-    val wire2 = buildWire(secondInstructions)
+    val wire1 = buildWire(moveInstructions1)
+    val wire2 = buildWire(moveInstructions2)
 
     val intersections = findIntersections(wire1, wire2)
 
@@ -28,19 +28,19 @@ fun nearestManhattanDistance(intersections: List<Coordinate>) =
 fun findIntersections(wire1: List<Coordinate>, wire2: List<Coordinate>) =
     wire1.intersect(wire2).filter { !it.isOrigin() }
 
-fun buildWire(firstInstruction: List<MoveInstruction>) : List<Coordinate> =
-    firstInstruction.fold(listOf(theOrigin)) {
+fun buildWire(moveInstructions: List<MoveInstruction>) : List<Coordinate> =
+    moveInstructions.fold(listOf(theOrigin)) {
             wireSoFar, moveInstruction -> wireSoFar.plus(wireSoFar.last().coordsInDirection(moveInstruction))
     }
 
 fun getWireInstructions() : Pair<List<MoveInstruction>, List<MoveInstruction>> {
-    val (firstInstruction, secondInstruction) = readLinesFromFile("day3.txt")
+    val (line1, line2) = readLinesFromFile("day3.txt")
 
     return Pair(
-        inputLineToMoveInstructions(firstInstruction),
-        inputLineToMoveInstructions(secondInstruction)
+        inputLineToMoveInstructions(line1),
+        inputLineToMoveInstructions(line2)
     )
 }
 
-fun inputLineToMoveInstructions(firstInstruction: String) =
-    firstInstruction.split(",").map { it.toMoveInstruction() }
+fun inputLineToMoveInstructions(line: String) =
+    line.split(",").map { it.toMoveInstruction() }
