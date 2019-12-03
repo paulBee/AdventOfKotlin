@@ -20,13 +20,10 @@ fun main () {
     println("The closest intersection to the start of the wires is $timingAnswer")
 }
 
-
-
 fun nearestManhattanDistance(intersections: List<Coordinate>) =
     intersections
         .map { it.manhattanDistanceTo(theOrigin) }
         .min()
-
 
 fun findIntersections(wire1: List<Coordinate>, wire2: List<Coordinate>) =
     wire1.intersect(wire2).filter { !it.isOrigin() }
@@ -35,8 +32,6 @@ fun buildWire(firstInstruction: List<MoveInstruction>) : List<Coordinate> =
     firstInstruction.fold(listOf(theOrigin)) {
             wireSoFar, moveInstruction -> wireSoFar.plus(wireSoFar.last().coordsInDirection(moveInstruction))
     }
-
-
 
 fun getWireInstructions() : Pair<List<MoveInstruction>, List<MoveInstruction>> {
     val (firstInstruction, secondInstruction) = readLinesFromFile("day3.txt")
