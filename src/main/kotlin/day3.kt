@@ -2,30 +2,30 @@ import coOrdinates.CoOrdinate
 import coOrdinates.MoveInstruction
 import coOrdinates.theOrigin
 import coOrdinates.toMoveInstruction
-import java.lang.IllegalArgumentException
 
 fun main () {
     val (firstInstructions, secondInstructions) = getWireInstructions()
+
     val wire1 = buildWire(firstInstructions)
     val wire2 = buildWire(secondInstructions)
 
     val intersections = findIntersections(wire1, wire2)
-    val manhattanAnswer = nearestManhattanDistance(intersections)
 
-    val minByTiming = intersections
+    val manhattanAnswer = nearestManhattanDistance(intersections)
+    val timingAnswer = intersections
         .map { wire1.indexOf(it) + wire2.indexOf(it) }
         .min()
 
-    println(manhattanAnswer)
-    println(minByTiming)
+    println("The closest intersection to the origin is $manhattanAnswer")
+    println("The closest intersection to the start of the wires is $timingAnswer")
 }
 
 
 
 fun nearestManhattanDistance(intersections: List<CoOrdinate>) =
     intersections
-        .map { it.manHattenDistanceTo(theOrigin) }
-        .min()?: throw IllegalArgumentException("These lines dont intersect fool!")
+        .map { it.manhattanDistanceTo(theOrigin) }
+        .min()
 
 
 fun findIntersections(
@@ -35,7 +35,7 @@ fun findIntersections(
     .filter { !it.isOrigin() }
 
 fun buildWire(firstInstruction: List<MoveInstruction>) : List<CoOrdinate> =
-    firstInstruction.fold(listOf(CoOrdinate(0,0))) {
+    firstInstruction.fold(listOf(theOrigin)) {
             wireSoFar, moveInstruction -> wireSoFar.plus(wireSoFar.last().coordsInDirection(moveInstruction))
     }
 
