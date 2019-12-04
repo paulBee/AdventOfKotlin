@@ -3,7 +3,9 @@ fun hasRepeat (password: String) : Boolean =
     password.windowed(2).any { it[0] == it[1] }
 
 fun hasPairedDigits (password : String) : Boolean =
-    password.toList().chunkOnChange().any { it.size == 2 }
+    password.toList()
+        .chunkWhen { a, b -> a != b }
+        .any { it.size == 2 }
 
 fun doesntDecrease (password: String) : Boolean =
     password.windowed(2).none { it[0].toInt() > it[1].toInt() }

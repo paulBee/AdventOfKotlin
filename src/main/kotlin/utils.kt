@@ -17,12 +17,11 @@ fun <S, T> productOf(iter1 : Iterable<S>, iter2: Iterable<T>) : Iterable<Pair<S,
     }
 
 /**
- * chunks a list in to sub lists for every change in adjacent elements
- * [ a a b a c c d ] -> [ [ a a ] [ b ] [ a ] [ c c ] [ d ] ]
+ * chunks a list in to sub lists every time adjacent elements pass the supplied check
  */
-fun <T> List<T>.chunkOnChange (): List<List<T>> =
-    this.fold(mutableListOf<MutableList<T>>()) { chunks, next ->
-        if (chunks.lastOrNull()?.contains(next) == true) {
+fun <T> List<T>.chunkWhen(newChunkWhenTrue: (T, T) -> Boolean): MutableList<MutableList<T>> {
+    return this.fold(mutableListOf()) { chunks, next ->
+        if (chunks.lastOrNull()?.let { newChunkWhenTrue.invoke(it.last(), next) } == true) {
             chunks.last().add(next)
             chunks
         } else {
@@ -30,3 +29,4 @@ fun <T> List<T>.chunkOnChange (): List<List<T>> =
             chunks
         }
     }
+}
