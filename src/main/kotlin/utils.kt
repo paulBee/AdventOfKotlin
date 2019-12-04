@@ -19,8 +19,8 @@ fun <S, T> productOf(iter1 : Iterable<S>, iter2: Iterable<T>) : Iterable<Pair<S,
 /**
  * chunks a list in to sub lists every time adjacent elements pass the supplied check
  */
-fun <T> List<T>.chunkWhen(newChunkWhenTrue: (T, T) -> Boolean): MutableList<MutableList<T>> {
-    return this.fold(mutableListOf()) { chunks, next ->
+fun <T> List<T>.chunkWhen(newChunkWhenTrue: (T, T) -> Boolean): List<List<T>> {
+    return this.fold(mutableListOf<MutableList<T>>()) { chunks, next ->
         if (chunks.lastOrNull()?.let { newChunkWhenTrue.invoke(it.last(), next) } == true) {
             chunks.last().add(next)
             chunks
