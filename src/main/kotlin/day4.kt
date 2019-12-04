@@ -1,5 +1,5 @@
 
-fun hasDuplicate (password: String) : Boolean =
+fun hasRepeat (password: String) : Boolean =
     password.windowed(2).any { it[0] == it[1] }
 
 fun hasPairedDigits (password : String) : Boolean =
@@ -11,7 +11,7 @@ fun doesntDecrease (password: String) : Boolean =
 fun main() {
     // sort of cheating not parsing the input, but this code is not improved by the extra regex
     val validPasswordsPart1 = (158126..624574).map { it.toString() }
-        .filter { hasDuplicate(it) && doesntDecrease(it) }
+        .filter { hasRepeat(it) && doesntDecrease(it) }
     val validPasswordsPart2 = (158126..624574).map { it.toString() }
         .filter { hasPairedDigits(it) && doesntDecrease(it) }
 
