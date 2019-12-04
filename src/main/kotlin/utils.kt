@@ -22,7 +22,7 @@ fun <S, T> productOf(iter1 : Iterable<S>, iter2: Iterable<T>) : Iterable<Pair<S,
 fun <T> List<T>.chunkWhen(newChunkWhenTrue: (T, T) -> Boolean): List<List<T>> {
     return this.fold(mutableListOf<MutableList<T>>()) { chunks, next ->
         if (chunks.lastOrNull()?.let { newChunkWhenTrue.invoke(it.last(), next) } == true) {
-            chunks.last().add(next)
+            chunks.last() += next
             chunks
         } else {
             chunks += mutableListOf(next)
