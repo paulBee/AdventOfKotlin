@@ -9,7 +9,6 @@ fun main() {
     // sort of cheating not parsing the input, but this code is not improved by the extra regex
     val validPasswords = (158126..624574)
         .filter { hasPairedDigits(it.toString()) && doesntDecrease(it.toString()) }
-        .count()
 
-    println(validPasswords)
+    println(validPasswords.count())
 }
