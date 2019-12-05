@@ -19,14 +19,18 @@ fun <S, T> productOf(iter1 : Iterable<S>, iter2: Iterable<T>) : Iterable<Pair<S,
 /**
  * chunks a list in to sub lists every time adjacent elements pass the supplied check
  */
-fun <T> List<T>.chunkWhen(newChunkWhenTrue: (T, T) -> Boolean): List<List<T>> {
-    return this.fold(mutableListOf<MutableList<T>>()) { chunks, next ->
-        if (chunks.lastOrNull()?.let { newChunkWhenTrue.invoke(it.last(), next) } == true) {
-            chunks.last() += next
-            chunks
-        } else {
-            chunks += mutableListOf(next)
-            chunks
+fun <T> List<T>.chunkWhen(newChunkWhenTrue: (T, T) -> Boolean): List<List<T>> =
+    this.asSequence().chunkWhen(newChunkWhenTrue).toList()
+
+fun <T> Sequence<T>.chunkWhen(fn: (T, T) -> Boolean) : Sequence<List<T>> =
+    sequence {
+        var chunk = mutableListOf<T>()
+        for (element in this@chunkWhen) {
+            if (chunk.lastOrNull()?.let { fn.invoke(it, element) } == true) {
+                yield(chunk)
+                chunk = mutableListOf<T>()
+            }
+            chunk.plusAssign(element)
         }
+        yield(chunk)
     }
-}
