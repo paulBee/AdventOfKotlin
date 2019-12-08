@@ -1,14 +1,19 @@
-import intcodeComputers.Computer
+import intcodeComputers.Program
 
 fun main() {
-    val computer = Computer(programInput())
-
     productOf((0..99), (0..99))
-        .first { (noun, verb) -> computer.runProgram(noun, verb) == 19690720 }
+        .first { (noun, verb) -> configureProgram(noun, verb, programInput()).run() == 19690720 }
         .let { (noun, verb) ->
             println("Sir... we got him! \uD83D\uDC4D")
             println("noun: $noun verb: $verb answer: ${(100 * noun) + verb}")
         }
+}
+
+fun configureProgram(noun: Int, verb: Int, instruction: List<Int>): Program {
+    val workingMemory = instruction.toMutableList()
+    workingMemory[1] = noun
+    workingMemory[2] = verb
+    return Program(workingMemory)
 }
 
 fun programInput() : List<Int> =
