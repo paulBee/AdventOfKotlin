@@ -1,21 +1,28 @@
 package intcodeComputers
 
-import java.lang.IllegalStateException
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
 
-class Program(private val workingMemory: MutableList<Int>, private val input: Int = 0) {
+val defaultInput = Channel<Int>()
+val defualtOutput = Channel<Int>()
+
+@ExperimentalCoroutinesApi
+class Program(private val workingMemory: MutableList<Int>, private val input: Channel<Int> = defaultInput, private val output: Channel<Int> = defualtOutput, private val name: String = "program") {
 
     private var instructionPointer = 0
 
-    fun run(): Int {
-        while (!isTerminated()) {
-            runInstruction()
-        }
-        return getReturnValue()
-    }
+    suspend fun run(): Int {
 
-    fun runInstruction() {
+            while (!isTerminated()) {
+                runInstruction()
+            }
+            println("$name is finished")
+            return getReturnValue()
+        }
+
+    suspend fun runInstruction() {
         val nextInstruction = extractInstruction(instructionPointer)
-        println(nextInstruction)
+//        println("$name : $nextInstruction")
         performAction(nextInstruction)
         instructionPointer = newPointer(instructionPointer, nextInstruction)
     }
@@ -35,7 +42,7 @@ class Program(private val workingMemory: MutableList<Int>, private val input: In
         return Instruction(opcode, immediateParameters, parameterModes)
     }
 
-    fun performAction(instruction: Instruction) {
+    suspend fun performAction(instruction: Instruction) {
         when (instruction.opcode) {
             OPCODE.ADD -> {
                 val number1 = instruction.modeAwareParam(0, workingMemory)
@@ -51,11 +58,11 @@ class Program(private val workingMemory: MutableList<Int>, private val input: In
             }
             OPCODE.TAKE_INPUT -> {
                 val (saveIndex) = instruction.parameters
-                workingMemory[saveIndex] = input
+                workingMemory[saveIndex] = input.receive()
             }
             OPCODE.SEND_OUTPUT -> {
                 val outputVal = instruction.modeAwareParam(0, workingMemory)
-                println(outputVal)
+                output.send(outputVal)
             }
             OPCODE.JUMP_IF_TRUE -> {
                 if (instruction.modeAwareParam(0, workingMemory) != 0) {

@@ -1,6 +1,9 @@
 import intcodeComputers.Program
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 
-fun main() {
+@ExperimentalCoroutinesApi
+fun main() = runBlocking<Unit> {
     productOf((0..99), (0..99))
         .first { (noun, verb) -> configureProgram(noun, verb, programInput()).run() == 19690720 }
         .let { (noun, verb) ->
@@ -9,6 +12,7 @@ fun main() {
         }
 }
 
+@ExperimentalCoroutinesApi
 fun configureProgram(noun: Int, verb: Int, instruction: List<Int>): Program {
     val workingMemory = instruction.toMutableList()
     workingMemory[1] = noun
