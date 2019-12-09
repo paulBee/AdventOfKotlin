@@ -10,6 +10,7 @@ val defualtOutput = Channel<Int>()
 class Program(private val workingMemory: MutableList<Int>, private val input: Channel<Int> = defaultInput, private val output: Channel<Int> = defualtOutput, private val name: String = "program") {
 
     private var instructionPointer = 0
+    private var lastOutput = 0
 
     suspend fun run(): Int {
 
@@ -62,6 +63,7 @@ class Program(private val workingMemory: MutableList<Int>, private val input: Ch
             }
             OPCODE.SEND_OUTPUT -> {
                 val outputVal = instruction.modeAwareParam(0, workingMemory)
+                lastOutput = outputVal
                 output.send(outputVal)
             }
             OPCODE.JUMP_IF_TRUE -> {
@@ -105,7 +107,7 @@ class Program(private val workingMemory: MutableList<Int>, private val input: Ch
             OPCODE.END -> pointer
         }
 
-    fun getReturnValue(): Int = workingMemory[0]
+    fun getReturnValue(): Int = lastOutput
 
     fun isTerminated(): Boolean = currentOpcode() == OPCODE.END
 
