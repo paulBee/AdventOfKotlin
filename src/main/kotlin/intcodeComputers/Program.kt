@@ -3,16 +3,21 @@ package intcodeComputers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 
-val defaultInput = Channel<Int>()
-val defualtOutput = Channel<Int>()
+val defaultInput = Channel<Long>(Int.MAX_VALUE)
+val defualtOutput = Channel<Long>(Int.MAX_VALUE)
 
 @ExperimentalCoroutinesApi
-class Program(private val workingMemory: MutableList<Int>, private val input: Channel<Int> = defaultInput, private val output: Channel<Int> = defualtOutput, private val name: String = "program") {
+class Program(instructions: MutableList<Long>, private val input: Channel<Long> = defaultInput, private val output: Channel<Long> = defualtOutput, private val name: String = "program") {
 
-    private var instructionPointer = 0
-    private var lastOutput = 0
+    private val workingMemory = instructions.foldIndexed(HashMap<Long, Long>()) { index, acc, it ->
+        acc[index.toLong()] = it
+        acc
+     }
+    private var instructionPointer = 0L
+    private var relativeBase = 0L
+    private var lastOutput = 0L
 
-    suspend fun run(): Int {
+    suspend fun run(): Long {
 
             while (!isTerminated()) {
                 runInstruction()
@@ -23,12 +28,12 @@ class Program(private val workingMemory: MutableList<Int>, private val input: Ch
 
     suspend fun runInstruction() {
         val nextInstruction = extractInstruction(instructionPointer)
-//        println("$name : $nextInstruction")
+        println("$name : $nextInstruction")
         performAction(nextInstruction)
         instructionPointer = newPointer(instructionPointer, nextInstruction)
     }
 
-    fun extractInstruction(pointer: Int): Instruction {
+    fun extractInstruction(pointer: Long): Instruction {
         val opcodeInfo = workingMemory[pointer].toString()
         val opcode = opcodeInfo.takeLast(2).toInt().toOpcode()
         val parameterModes = opcodeInfo
@@ -37,56 +42,60 @@ class Program(private val workingMemory: MutableList<Int>, private val input: Ch
             .map { it.toString().toInt() }
 
         val immediateParameters = (instructionPointer..instructionPointer + opcode.parameterSize()).drop(1)
-            .map { workingMemory[it] }
+            .map { workingMemory.getOrDefault(it, 0) }
 
 
-        return Instruction(opcode, immediateParameters, parameterModes)
+        return Instruction(opcode, immediateParameters, parameterModes, relativeBase)
     }
 
     suspend fun performAction(instruction: Instruction) {
         when (instruction.opcode) {
             OPCODE.ADD -> {
-                val number1 = instruction.modeAwareParam(0, workingMemory)
-                val number2 = instruction.modeAwareParam(1, workingMemory)
-                val saveIndex = instruction.parameters[2]
+                val number1 = instruction.getterMode(0, workingMemory)
+                val number2 = instruction.getterMode(1, workingMemory)
+                val saveIndex = instruction.setterMode(2)
                 workingMemory[saveIndex] = number1 + number2
             }
             OPCODE.MULTIPLY -> {
-                val number1 = instruction.modeAwareParam(0, workingMemory)
-                val number2 = instruction.modeAwareParam(1, workingMemory)
-                val saveIndex = instruction.parameters[2]
+                val number1 = instruction.getterMode(0, workingMemory)
+                val number2 = instruction.getterMode(1, workingMemory)
+                val saveIndex = instruction.setterMode(2)
                 workingMemory[saveIndex] = number1 * number2
             }
             OPCODE.TAKE_INPUT -> {
-                val (saveIndex) = instruction.parameters
+                val saveIndex = instruction.setterMode(0)
                 workingMemory[saveIndex] = input.receive()
             }
             OPCODE.SEND_OUTPUT -> {
-                val outputVal = instruction.modeAwareParam(0, workingMemory)
+                val outputVal = instruction.getterMode(0, workingMemory)
                 lastOutput = outputVal
                 output.send(outputVal)
             }
             OPCODE.JUMP_IF_TRUE -> {
-                if (instruction.modeAwareParam(0, workingMemory) != 0) {
-                    instructionPointer = instruction.modeAwareParam(1, workingMemory)
+                if (instruction.getterMode(0, workingMemory) != 0L) {
+                    instructionPointer = instruction.getterMode(1, workingMemory)
                 }
             }
             OPCODE.JUMP_IF_FALSE -> {
-                if (instruction.modeAwareParam(0, workingMemory) == 0) {
-                    instructionPointer = instruction.modeAwareParam(1, workingMemory)
+                if (instruction.getterMode(0, workingMemory) == 0L) {
+                    instructionPointer = instruction.getterMode(1, workingMemory)
                 }
             }
             OPCODE.LESS_THAN -> {
-                val firstParam = instruction.modeAwareParam(0, workingMemory)
-                val secondParam = instruction.modeAwareParam(1, workingMemory)
-                val saveIndex = instruction.parameters[2]
-                workingMemory[saveIndex] = if (firstParam < secondParam) 1 else 0
+                val firstParam = instruction.getterMode(0, workingMemory)
+                val secondParam = instruction.getterMode(1, workingMemory)
+                val saveIndex = instruction.setterMode(2)
+                workingMemory[saveIndex] = if (firstParam < secondParam) 1L else 0L
             }
             OPCODE.EQUALS -> {
-                val firstParam = instruction.modeAwareParam(0, workingMemory)
-                val secondParam = instruction.modeAwareParam(1, workingMemory)
-                val saveIndex = instruction.parameters[2]
-                workingMemory[saveIndex] = if (firstParam == secondParam) 1 else 0
+                val firstParam = instruction.getterMode(0, workingMemory)
+                val secondParam = instruction.getterMode(1, workingMemory)
+                val saveIndex = instruction.setterMode(2)
+                workingMemory[saveIndex] = if (firstParam == secondParam) 1L else 0L
+            }
+            OPCODE.BASE_OFFSET -> {
+                val firstParam = instruction.getterMode(0, workingMemory)
+                relativeBase += firstParam
             }
             OPCODE.END -> {
                 // chill
@@ -94,20 +103,21 @@ class Program(private val workingMemory: MutableList<Int>, private val input: Ch
         }
     }
 
-    fun newPointer(pointer: Int, instruction: Instruction) : Int =
+    fun newPointer(pointer: Long, instruction: Instruction) : Long =
         when (instruction.opcode) {
             OPCODE.ADD -> pointer + 4
             OPCODE.MULTIPLY -> pointer + 4
             OPCODE.TAKE_INPUT -> pointer + 2
             OPCODE.SEND_OUTPUT -> pointer + 2
-            OPCODE.JUMP_IF_TRUE -> if (instruction.modeAwareParam(0, workingMemory) == 0) pointer + 3 else pointer
-            OPCODE.JUMP_IF_FALSE -> if (instruction.modeAwareParam(0, workingMemory) != 0) pointer + 3 else pointer
+            OPCODE.JUMP_IF_TRUE -> if (instruction.getterMode(0, workingMemory) == 0L) pointer + 3 else pointer
+            OPCODE.JUMP_IF_FALSE -> if (instruction.getterMode(0, workingMemory) != 0L) pointer + 3 else pointer
             OPCODE.LESS_THAN -> pointer + 4
             OPCODE.EQUALS -> pointer + 4
+            OPCODE.BASE_OFFSET -> pointer + 2
             OPCODE.END -> pointer
         }
 
-    fun getReturnValue(): Int = lastOutput
+    fun getReturnValue(): Long = workingMemory.getOrDefault(0L, 0)
 
     fun isTerminated(): Boolean = currentOpcode() == OPCODE.END
 
@@ -115,11 +125,20 @@ class Program(private val workingMemory: MutableList<Int>, private val input: Ch
 
 }
 
-data class Instruction(val opcode: OPCODE, val parameters: List<Int>, val parameterModes: List<Int>) {
-    fun modeAwareParam(i: Int, workingMemory: MutableList<Int>) =
+data class Instruction(val opcode: OPCODE, val parameters: List<Long>, val parameterModes: List<Int>, val baseOffset: Long) {
+    fun getterMode(i: Int, workingMemory: HashMap<Long, Long>) =
         when (parameterModes.getOrElse(i) { 0 }) {
-            0 -> workingMemory[parameters[i]]
+            0 -> workingMemory.getOrDefault(parameters[i], 0)
             1 -> parameters[i]
+            2 -> workingMemory.getOrDefault(baseOffset + parameters[i], 0)
+            else -> throw IllegalStateException("Invalid mode found")
+        }
+
+    fun setterMode(i: Int) =
+        when (parameterModes.getOrElse(i) { 0 }) {
+            0 -> parameters[i]
+            1 -> parameters[i]
+            2 -> baseOffset + parameters[i]
             else -> throw IllegalStateException("Invalid mode found")
         }
 }

@@ -5,6 +5,7 @@ enum class OPCODE {
     TAKE_INPUT, SEND_OUTPUT,
     JUMP_IF_TRUE, JUMP_IF_FALSE,
     LESS_THAN, EQUALS,
+    BASE_OFFSET,
     END;
 
     fun parameterSize(): Int =
@@ -17,6 +18,7 @@ enum class OPCODE {
             JUMP_IF_FALSE -> 2
             LESS_THAN -> 3
             EQUALS -> 3
+            BASE_OFFSET -> 1
             END -> 0
         }
 }
@@ -31,6 +33,7 @@ fun Int.toOpcode(): OPCODE =
         6 -> OPCODE.JUMP_IF_FALSE
         7 -> OPCODE.LESS_THAN
         8 -> OPCODE.EQUALS
+        9 -> OPCODE.BASE_OFFSET
         99 -> OPCODE.END
         else -> throw RuntimeException("good god its all gone Pete Tong! $this is no opcode")
     }

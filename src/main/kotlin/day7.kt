@@ -4,7 +4,7 @@ import kotlinx.coroutines.channels.Channel
 
 @ExperimentalCoroutinesApi
 fun main() = runBlocking<Unit> {
-    val programInstructions = readTextFromFile("day7.txt").split(",").map { it.toInt() }
+    val programInstructions = readTextFromFile("day7.txt").split(",").map { it.toLong() }
 
     val max = generateCombinationsOf(listOf(5, 6, 7, 8, 9))
         .map {
@@ -21,19 +21,19 @@ fun main() = runBlocking<Unit> {
 }
 
 @ExperimentalCoroutinesApi
-private suspend fun runPhaseGuess(programInstructions: List<Int>, phaseGuess: List<Int>): Int {
+private suspend fun runPhaseGuess(programInstructions: List<Long>, phaseGuess: List<Int>): Long {
     val (phase1, phase2, phase3, phase4, phase5) = phaseGuess
-    val firstOutput = Channel<Int>(Channel.UNLIMITED)
-    val secondOutput = Channel<Int>(Channel.UNLIMITED)
-    val thirdOutput = Channel<Int>(Channel.UNLIMITED)
-    val fourthOutput = Channel<Int>(Channel.UNLIMITED)
-    val fifthOutput = Channel<Int>(Channel.UNLIMITED)
-    fifthOutput.send(phase1)
-    firstOutput.send(phase2)
-    secondOutput.send(phase3)
-    thirdOutput.send(phase4)
-    fourthOutput.send(phase5)
-    fifthOutput.send(0)
+    val firstOutput = Channel<Long>(Channel.UNLIMITED)
+    val secondOutput = Channel<Long>(Channel.UNLIMITED)
+    val thirdOutput = Channel<Long>(Channel.UNLIMITED)
+    val fourthOutput = Channel<Long>(Channel.UNLIMITED)
+    val fifthOutput = Channel<Long>(Channel.UNLIMITED)
+    fifthOutput.send(phase1.toLong())
+    firstOutput.send(phase2.toLong())
+    secondOutput.send(phase3.toLong())
+    thirdOutput.send(phase4.toLong())
+    fourthOutput.send(phase5.toLong())
+    fifthOutput.send(0L)
     GlobalScope.launch {
         Program(programInstructions.toMutableList(), fifthOutput, firstOutput, "prog1").run()
     }

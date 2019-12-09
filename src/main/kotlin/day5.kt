@@ -5,10 +5,10 @@ import kotlinx.coroutines.runBlocking
 
 @ExperimentalCoroutinesApi
 fun main() = runBlocking<Unit> {
-    val instructions = readTextFromFile("day5.txt").split(",").map { it.toInt() }
+    val instructions = readTextFromFile("day5.txt").split(",").map { it.toLong() }
 
-    val channel = Channel<Int>()
-    channel.send(5)
+    val channel = Channel<Long>()
+    channel.send(5L)
     println(Program(instructions.toMutableList(), channel).run())
 
 }
