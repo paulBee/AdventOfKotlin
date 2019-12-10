@@ -13,7 +13,7 @@ fun main() = runBlocking<Unit> {
     launch { output.consumeEach { println("an output $it") } }
     val finalOutput = withContext(Dispatchers.Default) {
         Program(
-            programInstructions.toMutableList(),
+            programInstructions,
             input,
             output
         ).run()
