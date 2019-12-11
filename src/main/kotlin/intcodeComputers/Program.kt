@@ -3,12 +3,13 @@ package intcodeComputers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 
-val defaultInput = Channel<Long>(Int.MAX_VALUE)
-val defualtOutput = Channel<Long>(Int.MAX_VALUE)
-
 @ExperimentalCoroutinesApi
-class Program(instructions: List<Long>, private val input: Channel<Long> = defaultInput, private val output: Channel<Long> = defualtOutput, private val name: String = "program") {
-
+class Program(
+    instructions: List<Long>,
+    private val input: Channel<Long> = Channel(Int.MAX_VALUE),
+    private val output: Channel<Long> = Channel(Int.MAX_VALUE),
+    private val name: String = "program"
+) {
     private val workingMemory = instructions.foldIndexed(HashMap<Long, Long>()) { index, acc, it ->
         acc[index.toLong()] = it
         acc
@@ -16,6 +17,8 @@ class Program(instructions: List<Long>, private val input: Channel<Long> = defau
     private var instructionPointer = 0L
     private var relativeBase = 0L
     private var lastOutput = 0L
+
+    var inputsRequested = 0
 
     suspend fun run(): Long {
         while (true) {
@@ -29,11 +32,12 @@ class Program(instructions: List<Long>, private val input: Channel<Long> = defau
 
     private suspend fun runInstruction(): Instruction {
         val nextInstruction = extractInstruction()
+//        println(nextInstruction)
         runEffects(nextInstruction)
         return nextInstruction
     }
 
-    fun extractInstruction(): Instruction {
+    private fun extractInstruction(): Instruction {
         val opcodeInfo = workingMemory[instructionPointer].toString()
         val opcode = opcodeInfo.takeLast(2).toInt().toOpcode()
         val parameterModes = opcodeInfo
@@ -48,7 +52,7 @@ class Program(instructions: List<Long>, private val input: Channel<Long> = defau
         return Instruction(opcode, immediateParameters, parameterModes, relativeBase)
     }
 
-    suspend fun runEffects(instruction: Instruction) {
+    private suspend fun runEffects(instruction: Instruction) {
         when (instruction.opcode) {
             OPCODE.ADD -> {
                 val number1 = instruction.getterMode(0, workingMemory)
@@ -66,7 +70,7 @@ class Program(instructions: List<Long>, private val input: Channel<Long> = defau
             }
             OPCODE.TAKE_INPUT -> {
                 val saveIndex = instruction.setterMode(0)
-                workingMemory[saveIndex] = input.receive()
+                takeFromInput(saveIndex)
                 instructionPointer += 2
             }
             OPCODE.SEND_OUTPUT -> {
@@ -112,6 +116,12 @@ class Program(instructions: List<Long>, private val input: Channel<Long> = defau
                 // chill
             }
         }
+    }
+
+    private suspend fun takeFromInput(saveIndex: Long) {
+//        println("asking for input")
+        inputsRequested++
+        workingMemory[saveIndex] = input.receive()
     }
 
     private fun getReturnValue(): Long = workingMemory.getOrDefault(0L, 0)

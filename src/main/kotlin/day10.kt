@@ -12,6 +12,33 @@ fun main () {
     val ySize = fileLines.size
     val xSize = fileLines[0].length
 
+    val allDirections = buildDirections(xSize, ySize)
+    val roidMap = buildRoidMap(fileLines)
+
+    val bestLocation = roidMap.keys
+        .maxBy { countRoids(it, roidMap, allDirections) }
+        ?:throw IllegalStateException("Guys! We got no roids!!")
+
+    println("Best location is: $bestLocation")
+    println("it can see ${countRoids(bestLocation, roidMap, allDirections)} roids")
+
+    val first200 = allDirections.asSequence().sortedWith(DirectionSorter)
+        .map { asteroidInDirection(bestLocation, roidMap, it) }
+        .filter { it?.let { true } ?: false }
+        .map { it?: throw RuntimeException("")}
+        .take(200).toList()
+
+    println("Value of roid 200 is: ${first200.last().let { (it.x * 100) + it.y }}")
+    printGrid(first200, ySize, xSize)
+}
+
+private fun buildRoidMap(fileLines: List<String>): HashMap<Coordinate, TYPE> =
+    fileLines
+        .mapIndexed { y, line -> line.mapIndexed { x, char -> Pair(Coordinate(x, y), char.toString().roidOrVoid()) } }
+        .flatten()
+        .fold(HashMap()) { acc, pair -> acc[pair.first] = pair.second; acc }
+
+private fun buildDirections(xSize: Int, ySize: Int): List<DirectionRatio> {
     val quarterOfDirections = productOf((1 until xSize - 1), (1 until ySize - 1))
         .map { DirectionRatio(it.first, it.second) }
         .map { it.toSimplestForm() }
@@ -32,26 +59,7 @@ fun main () {
             DirectionRatio(-1, 0)
         )
     )
-    val coordsToType = fileLines
-        .mapIndexed { y, line -> line.mapIndexed { x, char -> Pair(Coordinate(x, y), char.toString().roidOrVoid()) }  }
-        .flatten()
-        .fold(HashMap<Coordinate, TYPE>()) { acc, pair -> acc[pair.first] = pair.second; acc }
-
-    val bestLocation = coordsToType.keys
-        .maxBy { countRoids(it, coordsToType, allDirections) }
-        ?:throw IllegalStateException("Guys! We got no roids!!")
-
-    println("Best location is: $bestLocation")
-    println("it can see ${countRoids(bestLocation, coordsToType, allDirections)} roids")
-
-    val first200 = allDirections.sortedWith(DirectionSorter)
-        .map { asteroidInDirection(bestLocation, coordsToType, it) }
-        .filter { it?.let { true } ?: false }
-        .map { it?: throw RuntimeException("")}
-        .take(200)
-
-    println("Value of roid 200 is: ${first200.last().let { (it.x * 100) + it.y }}")
-    printGrid(first200, ySize, xSize)
+    return allDirections
 }
 
 private fun printGrid(vapedRoids: List<Coordinate>, ySize: Int, xSize: Int) {
@@ -80,11 +88,11 @@ object DirectionSorter : Comparator<DirectionRatio> {
             return 0
         }
 
-        val quadrant1 = first.pickQuadrant()
-        val quadrant2 = second.pickQuadrant()
+        val quadrant1 = first.quadrant()
+        val quadrant2 = second.quadrant()
 
         return if (quadrant1 != quadrant2) {
-            quadrant1.sortOrder() - quadrant2.sortOrder()
+            quadrant1.sortOrder().compareTo(quadrant2.sortOrder())
         } else {
             val mostYDir = calcGrad(first).compareTo(calcGrad(second))
             when (quadrant1) {
