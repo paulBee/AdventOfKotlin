@@ -2,6 +2,7 @@ package intcodeComputers
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
+import java.lang.invoke.MethodHandles.loop
 
 @ExperimentalCoroutinesApi
 class Program(
@@ -17,8 +18,10 @@ class Program(
     private var instructionPointer = 0L
     private var relativeBase = 0L
     private var lastOutput = 0L
+    private var savedInstruction: Instruction? = null
 
     var inputsRequested = 0
+
 
     suspend fun run(): Long {
         while (true) {
@@ -28,6 +31,37 @@ class Program(
                 return getReturnValue()
             }
         }
+    }
+
+    suspend fun runUntilInput(): InputOrDone {
+        savedInstruction?.run {
+            runEffects(this)
+            savedInstruction = null
+        }
+       return loopUntilInput()
+    }
+
+    private tailrec suspend fun loopUntilInput(): InputOrDone {
+        val nextInstruction = extractInstruction()
+//        println(nextInstruction)
+        return when(nextInstruction.opcode) {
+            OPCODE.END -> {
+                println("program finished")
+                InputOrDone(true, getReturnValue())
+            }
+            OPCODE.TAKE_INPUT -> {
+                savedInstruction = nextInstruction
+                InputOrDone(false)
+            }
+            else -> {
+                runEffects(nextInstruction)
+                loopUntilInput()
+            }
+        }
+    }
+
+    data class InputOrDone(val completed: Boolean, val returnCode: Long = 0) {
+
     }
 
     private suspend fun runInstruction(): Instruction {
