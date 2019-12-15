@@ -4,6 +4,8 @@ fun readLinesFromFile(fileName: String): List<String> = readFile(fileName).readL
 
 fun readTextFromFile(fileName: String): String = readFile(fileName).readText()
 
+fun readProgramInstructions(fileName: String) = readTextFromFile(fileName).split(",").map { it.toLong() }
+
 private fun readFile(fileName: String) = File("src/main/resources/$fileName")
 
 fun highestCommonFactor(number1: Int, number2: Int): Int =

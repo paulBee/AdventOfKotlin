@@ -11,7 +11,7 @@ import kotlin.collections.HashMap
 suspend fun main() {
 
     withContext(Dispatchers.Default) {
-        val programInstructions = readTextFromFile("day13.txt").split(",").map { it.toLong() }
+        val programInstructions = readProgramInstructions("day13.txt")
         val inputChannel = Channel<Long>(Int.MAX_VALUE)
         val outputChanel = Channel<Long>(Int.MAX_VALUE)
         val program = Program(programInstructions, inputChannel, outputChanel)

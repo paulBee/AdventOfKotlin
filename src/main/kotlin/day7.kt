@@ -4,7 +4,7 @@ import kotlinx.coroutines.channels.Channel
 
 @ExperimentalCoroutinesApi
 fun main() = runBlocking<Unit> {
-    val programInstructions = readTextFromFile("day7.txt").split(",").map { it.toLong() }
+    val programInstructions = readProgramInstructions("day7.txt")
 
     val max = generateCombinationsOf(listOf(5, 6, 7, 8, 9))
         .map {

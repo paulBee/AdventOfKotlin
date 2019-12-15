@@ -178,3 +178,28 @@ data class Instruction(val opcode: OPCODE, val parameters: List<Long>, val param
             else -> throw IllegalStateException("Invalid mode found")
         }
 }
+
+@ExperimentalCoroutinesApi
+class InputOutputComputer(programInstructions: List<Long>) {
+
+    private val input = Channel<Long>(Int.MAX_VALUE)
+    private val output = Channel<Long>(Int.MAX_VALUE)
+    private val program = Program(programInstructions, input, output)
+
+    suspend fun start() {
+        program.runUntilInput()
+    }
+    suspend fun getOutputForInput(next: Long) : List<Long> {
+        input.send(next)
+        program.runUntilInput()
+        return drainOutput()
+    }
+
+    suspend fun drainOutput(): List<Long> {
+        val outputs = ArrayList<Long>()
+        while (!output.isEmpty) {
+            outputs.add(output.receive())
+        }
+        return outputs
+    }
+}

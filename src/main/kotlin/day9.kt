@@ -5,7 +5,7 @@ import kotlinx.coroutines.channels.consumeEach
 
 @ExperimentalCoroutinesApi
 fun main() = runBlocking<Unit> {
-    val programInstructions = readTextFromFile("day9.txt").split(",").map { it.toLong() }
+    val programInstructions = readProgramInstructions("day9.txt")
 
     val input = Channel<Long>(Int.MAX_VALUE)
     val output = Channel<Long>(Int.MAX_VALUE)

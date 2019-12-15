@@ -25,6 +25,12 @@ data class Coordinate(val x : Int, val y : Int) {
     fun isOrigin(): Boolean = this == theOrigin
 
     fun follow(direction: DirectionRatio) = Coordinate(this.x + direction.deltaX, this.y + direction.deltaY)
+    fun allAdjacent() = listOf(
+        Coordinate(this.x - 1, this.y),
+        Coordinate(this.x + 1, this.y),
+        Coordinate(this.x, this.y - 1),
+        Coordinate(this.x, this.y + 1)
+    )
 }
 
 val theOrigin = Coordinate(0, 0)

@@ -9,7 +9,7 @@ import robots.PaintingRobot
 @ExperimentalCoroutinesApi
 fun main() = runBlocking {
 
-    val programInstructions = readTextFromFile("day11.txt").split(",").map { it.toLong() }
+    val programInstructions = readProgramInstructions("day11.txt")
 
     part1(programInstructions)
 
