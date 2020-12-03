@@ -1,8 +1,11 @@
+package year2019
+
 import coOrdinates.Coordinate
 import intcodeComputers.InputOutputComputer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.withContext
+import readProgramInstructions
 import kotlin.math.ceil
 import java.lang.RuntimeException
 
@@ -14,7 +17,7 @@ const val West = 4L
 
 @ExperimentalCoroutinesApi
 suspend fun main() {
-    val programInstructions = readProgramInstructions("day15.txt")
+    val programInstructions = readProgramInstructions("2019/day15.txt")
     val inputOutputComputer = InputOutputComputer(programInstructions)
 
     var currentPosition = Coordinate(0,0)
@@ -85,10 +88,10 @@ fun printMap(knownPixels: MutableMap<Coordinate, String>) {
     val xPixels = knownPixels.map { it.key.x }
     val yPixels = knownPixels.map { it.key.y }
 
-    val minx = xPixels.min()?: throw RuntimeException(" no pixels")
-    val maxx = xPixels.max()?: throw RuntimeException(" no pixels")
-    val miny = yPixels.min()?: throw RuntimeException(" no pixels")
-    val maxy = yPixels.max()?: throw RuntimeException(" no pixels")
+    val minx = xPixels.minOrNull()?: throw RuntimeException(" no pixels")
+    val maxx = xPixels.maxOrNull()?: throw RuntimeException(" no pixels")
+    val miny = yPixels.minOrNull()?: throw RuntimeException(" no pixels")
+    val maxy = yPixels.maxOrNull()?: throw RuntimeException(" no pixels")
 
     (miny..maxy).forEach { y ->
         println((minx..maxx)
@@ -110,6 +113,7 @@ private fun Long.pixelString() =
 
 private fun Long.isWall() = this == 0L
 
+@ExperimentalCoroutinesApi
 suspend fun tryMove(currentDirection: Long, inputOutputComputer: InputOutputComputer) =
    inputOutputComputer.getOutputForInput(currentDirection)[0]
 

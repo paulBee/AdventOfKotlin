@@ -1,7 +1,10 @@
+package year2019
+
+import readTextFromFile
 import kotlin.math.abs
 
 fun main() {
-    val initialPhase = readTextFromFile("day16.txt").toList().map { it.toString().toInt() }
+    val initialPhase = readTextFromFile("2019/day16.txt").toList().map { it.toString().toInt() }
     part1(initialPhase)
     part2(initialPhase)
 

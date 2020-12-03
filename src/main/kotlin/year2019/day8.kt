@@ -1,7 +1,10 @@
+package year2019
+
+import readTextFromFile
 import java.lang.IllegalStateException
 
 fun main() {
-    val encrpytedInput = readTextFromFile("day8.txt").map { it.toString().toInt() }
+    val encrpytedInput = readTextFromFile("2019/day8.txt").map { it.toString().toInt() }
 
     val layerSize = 25*6
 

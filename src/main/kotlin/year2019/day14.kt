@@ -1,3 +1,6 @@
+package year2019
+
+import readLinesFromFile
 import kotlin.RuntimeException
 import kotlin.math.ceil
 
@@ -6,7 +9,7 @@ const val ore = "ORE"
 const val max_ore = 1000000000000L
 
 fun main() {
-    val reactions = readLinesFromFile("day14.txt").map { it.toReaction() }
+    val reactions = readLinesFromFile("2019/day14.txt").map { it.toReaction() }
 
     val chemicalToComplexity = distanceFromORE(reactions).fold(HashMap<Chemical, Long>()) {
         map, pair ->
@@ -52,7 +55,7 @@ fun simplify(
     chemicalToComplexity: HashMap<Chemical, Long>,
     reactions: List<Reaction>
 ): HashMap<String, Long> {
-    val nextToSimplify = requirements.keys.maxBy { chemicalToComplexity[it] ?: throw RuntimeException("wtf") } ?: throw RuntimeException("wtf")
+    val nextToSimplify = requirements.keys.maxByOrNull { chemicalToComplexity[it] ?: throw RuntimeException("wtf") } ?: throw RuntimeException("wtf")
     val amountNeeded = requirements[nextToSimplify] ?: throw RuntimeException("wtf")
     requirements.remove(nextToSimplify)
 

@@ -1,10 +1,13 @@
+package year2019
+
 import intcodeComputers.Program
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
+import readProgramInstructions
 
 @ExperimentalCoroutinesApi
 fun main() = runBlocking<Unit> {
-    val programInstructions = readProgramInstructions("day7.txt")
+    val programInstructions = readProgramInstructions("2019/day7.txt")
 
     val max = generateCombinationsOf(listOf(5, 6, 7, 8, 9))
         .map {

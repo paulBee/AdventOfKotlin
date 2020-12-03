@@ -1,7 +1,10 @@
+package year2019
+
 import coOrdinates.Coordinate
 import coOrdinates.MoveInstruction
 import coOrdinates.theOrigin
 import coOrdinates.toMoveInstruction
+import readLinesFromFile
 
 fun main () {
     val (moveInstructions1, moveInstructions2) = getWireInstructions()
@@ -34,7 +37,7 @@ fun buildWire(moveInstructions: List<MoveInstruction>) : List<Coordinate> =
     }
 
 fun getWireInstructions() : Pair<List<MoveInstruction>, List<MoveInstruction>> {
-    val (line1, line2) = readLinesFromFile("day3.txt")
+    val (line1, line2) = readLinesFromFile("2019/day3.txt")
 
     return Pair(
         inputLineToMoveInstructions(line1),

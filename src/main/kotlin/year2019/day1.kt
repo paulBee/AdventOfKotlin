@@ -1,3 +1,7 @@
+package year2019
+
+import readLinesFromFile
+
 fun fuelForMass(mass: Int): Int =
     maxOf(
         (mass / 3) - 2,
@@ -16,4 +20,4 @@ fun main() {
     println("fuel for modules and fuel mass: ${masses.sumBy { fuelForMassAndFuel(it) }}")
 }
 
-fun listOfMasses(): List<Int> = readLinesFromFile("day1.txt").map { it.toInt() }
+fun listOfMasses(): List<Int> = readLinesFromFile("2019/day1.txt").map { it.toInt() }

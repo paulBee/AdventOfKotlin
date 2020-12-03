@@ -19,6 +19,15 @@ data class Coordinate(val x : Int, val y : Int) {
         }
     }
 
+    fun moveDistanceNegativeUP(direction: DIRECTION, it: Int): Coordinate {
+        return when (direction) {
+            DIRECTION.UP -> Coordinate(x, y - it)
+            DIRECTION.DOWN -> Coordinate(x, y + it)
+            DIRECTION.LEFT -> Coordinate(x - it, y)
+            DIRECTION.RIGHT -> Coordinate(x + it, y)
+        }
+    }
+
     fun manhattanDistanceTo(other: Coordinate): Int =
         abs(this.x - other.x) + abs(this.y - other.y)
 

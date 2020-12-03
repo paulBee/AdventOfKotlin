@@ -1,15 +1,18 @@
+package year2019
+
 import coOrdinates.Coordinate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import misc.COLOUR
+import readProgramInstructions
 import robots.PaintingRobot
 
 @ExperimentalCoroutinesApi
 fun main() = runBlocking {
 
-    val programInstructions = readProgramInstructions("day11.txt")
+    val programInstructions = readProgramInstructions("2019/day11.txt")
 
     part1(programInstructions)
 
@@ -39,10 +42,10 @@ fun printPaint(paintMap: Map<Coordinate, COLOUR>) {
     val xs = paintMap.keys.map { it.x }
     val ys =paintMap.keys.map { it.y }
 
-    val minX = xs.min()?: throw java.lang.IllegalStateException()
-    val maxX = xs.max()?: throw java.lang.IllegalStateException()
-    val minY = ys.min()?: throw java.lang.IllegalStateException()
-    val maxY = ys.max()?: throw java.lang.IllegalStateException()
+    val minX = xs.minOrNull()?: throw java.lang.IllegalStateException()
+    val maxX = xs.maxOrNull()?: throw java.lang.IllegalStateException()
+    val minY = ys.minOrNull()?: throw java.lang.IllegalStateException()
+    val maxY = ys.maxOrNull()?: throw java.lang.IllegalStateException()
 
     (minY..maxY).reversed().forEach {y ->
         val row = (minX..maxX).map { x -> Coordinate(x,y) }

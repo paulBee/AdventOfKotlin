@@ -1,11 +1,14 @@
+package year2019
+
 import intcodeComputers.Program
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
+import readProgramInstructions
 
 @ExperimentalCoroutinesApi
 fun main() = runBlocking<Unit> {
-    val programInstructions = readProgramInstructions("day9.txt")
+    val programInstructions = readProgramInstructions("2019/day9.txt")
 
     val input = Channel<Long>(Int.MAX_VALUE)
     val output = Channel<Long>(Int.MAX_VALUE)

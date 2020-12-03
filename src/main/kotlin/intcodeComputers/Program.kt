@@ -195,11 +195,13 @@ class InputOutputComputer(programInstructions: List<Long>) {
         return drainOutput()
     }
 
-    suspend fun drainOutput(): List<Long> {
-        val outputs = ArrayList<Long>()
-        while (!output.isEmpty) {
-            outputs.add(output.receive())
-        }
-        return outputs
+    private suspend fun drainOutput() = drainOutput(output)
+}
+
+suspend fun drainOutput(channel: Channel<Long>): List<Long> {
+    val outputs = ArrayList<Long>()
+    while (!channel.isEmpty) {
+        outputs.add(channel.receive())
     }
+    return outputs
 }

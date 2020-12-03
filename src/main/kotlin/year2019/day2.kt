@@ -1,6 +1,10 @@
+package year2019
+
 import intcodeComputers.Program
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import productOf
+import readTextFromFile
 
 @ExperimentalCoroutinesApi
 fun main() = runBlocking<Unit> {
@@ -21,6 +25,6 @@ fun configureProgram(noun: Int, verb: Int, instruction: List<Long>): Program {
 }
 
 fun programInput() : List<Long> =
-    readTextFromFile("day2.txt")
+    readTextFromFile("2019/day2.txt")
         .split(",")
         .map { it.toLong() }

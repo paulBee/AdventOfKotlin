@@ -1,9 +1,12 @@
+package year2019
+
 import coOrdinates.Coordinate
 import intcodeComputers.Program
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.withContext
+import readProgramInstructions
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
@@ -11,7 +14,7 @@ import kotlin.collections.HashMap
 suspend fun main() {
 
     withContext(Dispatchers.Default) {
-        val programInstructions = readProgramInstructions("day13.txt")
+        val programInstructions = readProgramInstructions("2019/day13.txt")
         val inputChannel = Channel<Long>(Int.MAX_VALUE)
         val outputChanel = Channel<Long>(Int.MAX_VALUE)
         val program = Program(programInstructions, inputChannel, outputChanel)
@@ -23,7 +26,7 @@ suspend fun main() {
             val paused = program.runUntilInput()
             updateScreen(outputChanel, screen)
             val gameState = evaluateGameState(screen)
-            val (ballX, paddleX, numberOfBlocks, currentScore) = gameState
+            val (ballX, paddleX, numberOfBlocks, _) = gameState
             when {
                 paddleX.x < ballX.x -> inputChannel.send(1L)
                 paddleX.x > ballX.x -> inputChannel.send(-1L)

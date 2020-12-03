@@ -2,12 +2,13 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.3.61"
+    kotlin("jvm") version "1.4.10"
 }
 
 repositories {
     mavenCentral()
 }
+
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
@@ -24,5 +25,5 @@ tasks.test {
 }
 
 tasks.withType<KotlinCompile>().configureEach {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = "13"
 }

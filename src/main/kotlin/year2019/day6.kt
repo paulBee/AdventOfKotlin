@@ -1,7 +1,9 @@
+package year2019
+import readLinesFromFile
 import java.lang.IllegalStateException
 
 fun main() {
-    val orbitInfo = readLinesFromFile("day6.txt")
+    val orbitInfo = readLinesFromFile("2019/day6.txt")
         .map { it.toOrbitRelationship() }
 
 

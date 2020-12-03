@@ -1,13 +1,17 @@
+package year2019
+
 import coOrdinates.Coordinate
 import coOrdinates.DirectionRatio
 import coOrdinates.QUADRANT
+import productOf
+import readLinesFromFile
 import java.lang.IllegalStateException
 import java.lang.Math.abs
 import java.lang.RuntimeException
 import java.util.Comparator
 
 fun main () {
-    val fileLines = readLinesFromFile("day10.txt")
+    val fileLines = readLinesFromFile("2019/day10.txt")
 
     val ySize = fileLines.size
     val xSize = fileLines[0].length
@@ -16,7 +20,7 @@ fun main () {
     val roidMap = buildRoidMap(fileLines)
 
     val bestLocation = roidMap.keys
-        .maxBy { countRoids(it, roidMap, allDirections) }
+        .maxByOrNull { countRoids(it, roidMap, allDirections) }
         ?:throw IllegalStateException("Guys! We got no roids!!")
 
     println("Best location is: $bestLocation")

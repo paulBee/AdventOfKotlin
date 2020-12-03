@@ -1,3 +1,6 @@
+package year2019
+
+import readLinesFromFile
 import java.lang.IllegalStateException
 import java.lang.Math.abs
 
@@ -7,7 +10,7 @@ fun main() {
 }
 
 private fun part1() {
-    val moons = readLinesFromFile("day12.txt")
+    val moons = readLinesFromFile("2019/day12.txt")
         .map { it.toVec3D() }
         .mapIndexed { index, startingPos -> Moon(index.toMoonName(), startingPos) }
 
@@ -33,7 +36,7 @@ private fun part2() {
 }
 
 private fun stepsUntil(endStateCheck: (List<Moon>) -> Boolean): Int {
-    val moons = readLinesFromFile("day12.txt")
+    val moons = readLinesFromFile("2019/day12.txt")
         .map { it.toVec3D() }
         .mapIndexed { index, startingPos -> Moon(index.toMoonName(), startingPos) }
 

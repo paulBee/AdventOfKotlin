@@ -10,6 +10,14 @@ enum class DIRECTION {
             LEFT -> if (direction == LEFT) DOWN else UP
             RIGHT -> if (direction == LEFT) UP else DOWN
         }
+
+    override fun toString() =
+        when (this) {
+            UP -> "U"
+            DOWN -> "D"
+            LEFT -> "L"
+            RIGHT -> "R"
+        }
 }
 
 fun String.toDirection() : DIRECTION =
