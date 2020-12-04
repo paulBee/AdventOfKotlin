@@ -1,53 +1,47 @@
 package year2020
 
-import chunkWhen
+import chunkOnEmptyLine
 import displayPart1
 import displayPart2
 import readLinesFromFile
 
 fun main() {
-    val passports = readLinesFromFile("2020/day4.txt")
-        .chunkWhen { _, element -> element == "" }
-        .map { passportData ->
-            passportData.filter { it != "" }
-                .flatMap { it.split(" ") }
-                .map { it.parseAttribute() }
-                .let { Passport(it) }
-        }
+    val passports = readLinesFromFile("2020/day4.txt").chunkOnEmptyLine()
+        .map { passportData -> passportData.flattenWhitespace().map { it.parseAttribute() } }
+        .map { Passport(it) }
 
     passports.count { it.containsAllMandatory() }.also(displayPart1)
     passports.count { it.isValid() }.also(displayPart2)
 }
 
-
-class Passport(attributes: List<PassportAttribute>) {
-
-    private val attrMap = attributes.map { it.name to it.data }.toMap()
-    private val attributeValidation = listOf(
-        AttributeValidator("byr", true, isPresentAnd(aNumberBetween(1920, 2002))), // (Birth Year)
-        AttributeValidator("iyr", true, isPresentAnd(aNumberBetween(2010, 2020))), // (Issue Year)
-        AttributeValidator("eyr", true, isPresentAnd(aNumberBetween(2020, 2030))), // (Expiration Year)
-        AttributeValidator("hgt", true, isPresentAnd(::validHeight)), // (Height)
-        AttributeValidator("hcl", true, isPresentAnd(passesRegex("#[0-9a-f]{6}"))), // (Hair Color)
-        AttributeValidator("ecl", true, isPresentAnd(passesRegex("(amb|blu|brn|gry|grn|hzl|oth)"))), // (Eye Color)
-        AttributeValidator("pid", true, isPresentAnd(passesRegex("[0-9]{9}"))), // (Passport ID)
-        AttributeValidator("cid", false, anyValue), // (Country ID)
-    )
-
-    fun containsAllMandatory() = attributeValidation.
-    all { (name, mandatory, _) -> attrMap.containsKey(name) || !mandatory }
-
-    fun isValid() = attributeValidation
-        .all { (name, mandatory, predicate) -> attrMap[name]?.let { predicate(it) } ?: !mandatory }
+class Passport(private val attributes: List<PassportAttribute>, private val mandatoryAttrs: List<String> = defaultMandatory) {
+    fun containsAllMandatory() = mandatoryAttrs.all { attr -> attributes.any { attr == it.name } }
+    fun isValid() = containsAllMandatory() && attributes.all { it.isValid() }
 }
 
-fun isPresentAnd(predicate: (String) -> Boolean): (String?) -> Boolean {
-    return { it?.let(predicate) ?: false }
+val defaultMandatory = listOf("byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid")
+
+data class PassportAttribute(val name: String, val data: String) {
+    fun isValid() =
+        when(name) {
+            "byr" -> validBirthYear(data)
+            "iyr" -> validIssueYear(data)
+            "eyr" -> validExpiryYear(data)
+            "hgt" -> validHeight(data)
+            "hcl" -> validHairColour(data)
+            "ecl" -> validEyeColour(data)
+            "pid" -> validPassportId(data)
+            "cid" -> true
+            else -> false
+        }
 }
 
-fun aNumberBetween(min: Long, max: Long): (String) -> Boolean {
-    return { it.toIntOrNull()?.let { int -> int in min..max } ?: false}
-}
+val validBirthYear = aNumberBetween(1920, 2002)
+val validIssueYear = aNumberBetween(2010, 2020)
+val validExpiryYear = aNumberBetween(2020, 2030)
+val validHairColour = Regex("#[0-9a-f]{6}")::matches
+val validEyeColour = Regex("(amb|blu|brn|gry|grn|hzl|oth)")::matches
+val validPassportId = Regex("[0-9]{9}")::matches
 
 fun validHeight(it: String): Boolean {
     val units = it.takeLast(2)
@@ -59,16 +53,9 @@ fun validHeight(it: String): Boolean {
     }
 }
 
-fun passesRegex(str: String): (String) -> Boolean {
-    val regex = str.toRegex()
-    return { regex.matches(it) }
+fun aNumberBetween(min: Long, max: Long): (String) -> Boolean {
+    return { it.toIntOrNull()?.let { int -> int in min..max } ?: false}
 }
-
-val anyValue = { _: String -> true }
-
-data class AttributeValidator(val name: String, val mandatory: Boolean, val validPredicate: (String) -> Boolean)
-
-data class PassportAttribute(val name: String, val data: String)
 
 fun String.parseAttribute(): PassportAttribute {
     val bits = this.split(':')
@@ -78,3 +65,5 @@ fun String.parseAttribute(): PassportAttribute {
     return PassportAttribute(bits[0], bits[1])
 
 }
+
+fun List<String>.flattenWhitespace() = this.flatMap { it.split(" ") }

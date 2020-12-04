@@ -2,6 +2,7 @@ package year2020
 
 import displayPart1
 import displayPart2
+import multiply
 import readLinesFromFile
 
 fun main() {
@@ -14,9 +15,7 @@ fun main() {
         treeSurvey.walkPath(right7Down1).count { it.isTree() },
         treeSurvey.walkPath(right1Down2).count { it.isTree() }
     )
-        .map{ it.toLong() }
-        .reduce { acc, i -> acc * i  }
-        .also(displayPart2)
+        .multiply().also(displayPart2)
 }
 
 class TreeSurvey(val data: List<String>) {

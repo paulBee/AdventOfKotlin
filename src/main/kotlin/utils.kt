@@ -42,6 +42,11 @@ fun <S, T> productOf(iter1 : Iterable<S>, iter2: Iterable<T>) : Iterable<Pair<S,
 fun <T> List<T>.chunkWhen(newChunkWhenTrue: (T, T) -> Boolean): List<List<T>> =
     this.asSequence().chunkWhen(newChunkWhenTrue).toList()
 
+fun List<String>.chunkOnEmptyLine() =
+    this.chunkWhen { _, element -> element.isBlank() }
+        .map { chunk -> chunk.filter { it.isNotBlank() } }
+
+
 fun <T> Sequence<T>.chunkWhen(fn: (T, T) -> Boolean) : Sequence<List<T>> =
     sequence {
         var chunk = mutableListOf<T>()
@@ -54,3 +59,10 @@ fun <T> Sequence<T>.chunkWhen(fn: (T, T) -> Boolean) : Sequence<List<T>> =
         }
         yield(chunk)
     }
+
+/**
+ * produces the product of a list of numbers, converts them to Long to reduce overflow issues
+ */
+fun List<Number>.multiply() =
+    this.map { it.toLong() }
+        .reduce { acc, i -> acc * i  }
