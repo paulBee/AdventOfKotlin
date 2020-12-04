@@ -1,6 +1,5 @@
 package year2020
 
-import displayAnswer
 import displayPart1
 import displayPart2
 import readLinesFromFile
