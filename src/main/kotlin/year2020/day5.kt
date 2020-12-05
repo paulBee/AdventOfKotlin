@@ -3,12 +3,12 @@ package year2020
 import displayPart1
 import displayPart2
 import readLinesFromFile
-import splitSize
+import splitAtIndex
 import toIntUsingDigitsOf
 
 fun main() {
     val sortedIds = readLinesFromFile("2020/day5.txt")
-        .map { it.splitSize(7) }
+        .map { it.splitAtIndex(7) }
         .map { (rowStr, seatStr) -> Pair(rowParser(rowStr), seatParser(seatStr)) }
         .map { (row, seat) -> boardingId(row, seat)}
         .sorted().also { displayPart1(it.last()) }

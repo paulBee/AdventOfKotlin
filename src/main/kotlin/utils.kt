@@ -33,7 +33,7 @@ fun highestCommonFactor(number1: Int, number2: Int): Int =
  * Splits the string in to 2 strings
  * size = if positive sets the size of the starting string, if negative the size of the ending string
  */
-fun String.splitSize(size: Int) =
+fun String.splitAtIndex(size: Int) =
     if (size < 0) {
         Pair(this.take(this.length + size), this.drop(this.length + size))
     } else {

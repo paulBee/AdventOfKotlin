@@ -4,7 +4,7 @@ import chunkOnEmptyLine
 import displayPart1
 import displayPart2
 import readLinesFromFile
-import splitSize
+import splitAtIndex
 
 fun main() {
     val passports = readLinesFromFile("2020/day4.txt").chunkOnEmptyLine()
@@ -45,7 +45,7 @@ val validEyeColour = Regex("(amb|blu|brn|gry|grn|hzl|oth)")::matches
 val validPassportId = Regex("[0-9]{9}")::matches
 
 fun validHeight(it: String) =
-    it.splitSize(-2)
+    it.splitAtIndex(-2)
         .let { (value, units) ->
             when (units) {
                 "cm" -> aNumberBetween(150, 193)(value)
