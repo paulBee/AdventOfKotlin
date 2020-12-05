@@ -20,17 +20,23 @@ fun main() {
     displayPart2(firstMissingNumber)
 }
 
-val rowParser = binaryParser('F', 'B')
-val seatParser = binaryParser('L', 'R')
+val rowParser = toInt('F', 'B')
+val seatParser = toInt('L', 'R')
 
 fun boardingId(row: Int, seat: Int) = row * 8 + seat
 
-fun binaryParser(zeroChar: Char, oneChar: Char): (String) -> Int {
-    val validationRegex = Regex("^[$zeroChar$oneChar]+$")
-    return {
-        if (validationRegex.matches(it))
-            it.replace(oneChar, '1').replace(zeroChar, '0').toInt(2)
-        else throw RuntimeException("That is BAD intelligence! $it has chars other than $zeroChar and $oneChar")
-    }
+/**
+ * parse a String to Int using arbitrary characters. Up to base 10
+ */
+fun toInt(vararg numberChars: Char): (String) -> Int {
 
+    if (numberChars.size > 10) throw IllegalArgumentException("String.toInt only supports up to base 10. Im not a goddam magician!")
+
+    val validationRegex = numberChars.joinToString("", "^[", "]$").toRegex()
+    val digitLookup = numberChars.mapIndexed { index, c -> c to "$index" }.toMap()
+
+    return { string ->
+        if (validationRegex.matches(string)) throw RuntimeException("That is BAD intelligence! $string has chars other than ${numberChars.joinToString(", ")}")
+        string.map { digitLookup[it]!! }.joinToString("").toInt(numberChars.size)
+    }
 }
