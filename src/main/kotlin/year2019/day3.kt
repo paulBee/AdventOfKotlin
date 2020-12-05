@@ -1,10 +1,10 @@
 package year2019
 
-import coOrdinates.Coordinate
-import coOrdinates.MoveInstruction
-import coOrdinates.theOrigin
-import coOrdinates.toMoveInstruction
-import readLinesFromFile
+import utils.coOrdinates.Coordinate
+import utils.coOrdinates.MoveInstruction
+import utils.coOrdinates.theOrigin
+import utils.coOrdinates.toMoveInstruction
+import utils.aoc.readLinesFromFile
 
 fun main () {
     val (moveInstructions1, moveInstructions2) = getWireInstructions()
@@ -17,7 +17,7 @@ fun main () {
     val manhattanAnswer = nearestManhattanDistance(intersections)
     val timingAnswer = intersections
         .map { wire1.indexOf(it) + wire2.indexOf(it) }
-        .min()
+        .minOrNull()
 
     println("The closest intersection to the origin is $manhattanAnswer")
     println("The closest intersection to the start of the wires is $timingAnswer")
@@ -26,7 +26,7 @@ fun main () {
 fun nearestManhattanDistance(intersections: List<Coordinate>) =
     intersections
         .map { it.manhattanDistanceTo(theOrigin) }
-        .min()
+        .minOrNull()
 
 fun findIntersections(wire1: List<Coordinate>, wire2: List<Coordinate>) =
     wire1.intersect(wire2).filter { !it.isOrigin() }

@@ -1,6 +1,6 @@
-package coOrdinates
+package utils.coOrdinates
 
-import highestCommonFactor
+import utils.algorithm.highestCommonFactor
 import java.lang.IllegalStateException
 import kotlin.math.abs
 

@@ -1,13 +1,13 @@
 package year2019
 
-import coOrdinates.Coordinate
+import utils.coOrdinates.Coordinate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import misc.COLOUR
-import readProgramInstructions
-import robots.PaintingRobot
+import year2019.misc.COLOUR
+import utils.aoc.readProgramInstructions
+import year2019.robots.PaintingRobot
 
 @ExperimentalCoroutinesApi
 fun main() = runBlocking {

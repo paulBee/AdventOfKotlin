@@ -1,6 +1,6 @@
 package year2019
 
-import readTextFromFile
+import utils.aoc.readTextFromFile
 import java.lang.IllegalStateException
 
 fun main() {
@@ -10,7 +10,7 @@ fun main() {
 
     val layers = encrpytedInput.chunked(layerSize)
     val answer = layers
-        .minBy { layer -> layer.count { it == 0 } }
+        .minByOrNull { layer -> layer.count { it == 0 } }
         ?.let { layer -> layer.count { it == 1 } * layer.count { it == 2 } }
     println(answer)
 

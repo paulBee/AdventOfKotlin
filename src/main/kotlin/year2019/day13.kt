@@ -1,12 +1,12 @@
 package year2019
 
-import coOrdinates.Coordinate
-import intcodeComputers.Program
+import utils.coOrdinates.Coordinate
+import year2019.intcodeComputers.Program
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.withContext
-import readProgramInstructions
+import utils.aoc.readProgramInstructions
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
@@ -51,6 +51,7 @@ fun evaluateGameState(screen: HashMap<Coordinate, Pixel>): GameState {
 
 }
 val scoreCoord = Coordinate(-1, 0)
+@ExperimentalCoroutinesApi
 suspend fun updateScreen(outputChanel: Channel<Long>, screen: HashMap<Coordinate, Pixel>) {
     drainOutput(outputChanel).chunked(3)
         .forEach {
@@ -79,6 +80,7 @@ fun Pixel.type() =
 
 enum class PixelType { EMPTY, WALL, BLOCK, PADDLE, BALL, SCORE }
 
+@ExperimentalCoroutinesApi
 private suspend fun drainOutput(source: Channel<Long>): List<Long> {
     // PRs very welcome for a cleaner way to do this
     val outputs = ArrayList<Long>()

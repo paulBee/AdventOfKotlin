@@ -1,9 +1,9 @@
 package year2019
 
-import intcodeComputers.Program
+import year2019.intcodeComputers.Program
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import readProgramInstructions
+import utils.aoc.readProgramInstructions
 
 @ExperimentalCoroutinesApi
 fun main() = runBlocking<Unit> {
@@ -16,7 +16,7 @@ fun main() = runBlocking<Unit> {
             guess
 
         }
-        .max()
+        .maxOrNull()
 
     println(max)
 

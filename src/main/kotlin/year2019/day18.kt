@@ -1,7 +1,7 @@
 package year2019
 
-import coOrdinates.Coordinate
-import readLinesFromFile
+import utils.coOrdinates.Coordinate
+import utils.aoc.readLinesFromFile
 
 fun main() {
     tryAllPaths()

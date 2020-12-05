@@ -1,10 +1,10 @@
 package year2019
 
-import intcodeComputers.Program
+import year2019.intcodeComputers.Program
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.runBlocking
-import readProgramInstructions
+import utils.aoc.readProgramInstructions
 
 @ExperimentalCoroutinesApi
 fun main() = runBlocking<Unit> {

@@ -1,9 +1,9 @@
 package year2020
 
-import displayPart1
-import displayPart2
-import multiply
-import readLinesFromFile
+import utils.aoc.displayPart1
+import utils.aoc.displayPart2
+import utils.collections.multiply
+import utils.aoc.readLinesFromFile
 
 fun main() {
     val treeSurvey = TreeSurvey(readLinesFromFile("2020/day3.txt"))

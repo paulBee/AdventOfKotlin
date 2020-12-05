@@ -1,12 +1,12 @@
 package year2019
 
-import chunkWhen
-import coOrdinates.Coordinate
-import coOrdinates.DIRECTION
-import intcodeComputers.Program
+import utils.collections.chunkWhen
+import utils.coOrdinates.Coordinate
+import utils.coOrdinates.DIRECTION
+import year2019.intcodeComputers.Program
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import readProgramInstructions
+import utils.aoc.readProgramInstructions
 
 @ExperimentalCoroutinesApi
 suspend fun main() {
@@ -20,7 +20,7 @@ suspend fun main() {
         Program(instructions, output = output).run()
     }
 
-    val outputValues = intcodeComputers.drainOutput(output)
+    val outputValues = year2019.intcodeComputers.drainOutput(output)
 
     outputValues.chunkWhen { _, it -> it == 10L }
         .mapIndexed { y, line ->
@@ -107,7 +107,7 @@ private suspend fun part2PostHuman() {
         ).run()
     }
 
-    val outputFromProg = withContext(Dispatchers.Default) { intcodeComputers.drainOutput(output) }
+    val outputFromProg = withContext(Dispatchers.Default) { year2019.intcodeComputers.drainOutput(output) }
     outputFromProg.forEach { print(it.toChar()) }
     println(outputFromProg.last())
 

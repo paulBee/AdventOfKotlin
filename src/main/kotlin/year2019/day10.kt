@@ -1,10 +1,10 @@
 package year2019
 
-import coOrdinates.Coordinate
-import coOrdinates.DirectionRatio
-import coOrdinates.QUADRANT
-import productOf
-import readLinesFromFile
+import utils.coOrdinates.Coordinate
+import utils.coOrdinates.DirectionRatio
+import utils.coOrdinates.QUADRANT
+import utils.collections.productOf
+import utils.aoc.readLinesFromFile
 import java.lang.IllegalStateException
 import java.lang.Math.abs
 import java.lang.RuntimeException

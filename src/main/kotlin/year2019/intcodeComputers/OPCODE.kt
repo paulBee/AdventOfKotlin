@@ -1,4 +1,4 @@
-package intcodeComputers
+package year2019.intcodeComputers
 
 enum class OPCODE {
     ADD, MULTIPLY,

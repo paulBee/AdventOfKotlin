@@ -1,4 +1,4 @@
-package misc
+package year2019.misc
 
 enum class COLOUR {
     BLACK, WHITE;

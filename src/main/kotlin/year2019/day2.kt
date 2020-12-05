@@ -1,10 +1,10 @@
 package year2019
 
-import intcodeComputers.Program
+import year2019.intcodeComputers.Program
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import productOf
-import readTextFromFile
+import utils.collections.productOf
+import utils.aoc.readTextFromFile
 
 @ExperimentalCoroutinesApi
 fun main() = runBlocking<Unit> {

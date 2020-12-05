@@ -1,6 +1,6 @@
 package year2019
 
-import readLinesFromFile
+import utils.aoc.readLinesFromFile
 import java.lang.IllegalStateException
 import java.lang.Math.abs
 

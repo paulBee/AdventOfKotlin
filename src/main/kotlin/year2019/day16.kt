@@ -1,6 +1,6 @@
 package year2019
 
-import readTextFromFile
+import utils.aoc.readTextFromFile
 import kotlin.math.abs
 
 fun main() {

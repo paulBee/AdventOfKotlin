@@ -1,11 +1,11 @@
 package year2019
 
-import coOrdinates.Coordinate
-import intcodeComputers.InputOutputComputer
+import utils.coOrdinates.Coordinate
+import year2019.intcodeComputers.InputOutputComputer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.withContext
-import readProgramInstructions
+import utils.aoc.readProgramInstructions
 import kotlin.math.ceil
 import java.lang.RuntimeException
 

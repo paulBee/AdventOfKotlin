@@ -1,11 +1,11 @@
-package robots
+package year2019.robots
 
-import coOrdinates.Coordinate
-import coOrdinates.DIRECTION
-import intcodeComputers.Program
+import utils.coOrdinates.Coordinate
+import utils.coOrdinates.DIRECTION
+import year2019.intcodeComputers.Program
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import misc.COLOUR
+import year2019.misc.COLOUR
 
 @ExperimentalCoroutinesApi
 class PaintingRobot(programInstructions: List<Long>, initialWhite: Map<Coordinate, COLOUR> = HashMap()) {

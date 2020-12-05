@@ -1,6 +1,6 @@
 package year2019
 
-import chunkWhen
+import utils.collections.chunkWhen
 
 fun hasRepeat (password: String) : Boolean =
     password.windowed(2).any { it[0] == it[1] }

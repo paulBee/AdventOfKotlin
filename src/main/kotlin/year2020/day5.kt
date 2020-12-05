@@ -1,10 +1,10 @@
 package year2020
 
-import displayPart1
-import displayPart2
-import readLinesFromFile
-import splitAtIndex
-import toIntUsingDigitsOf
+import utils.aoc.displayPart1
+import utils.aoc.displayPart2
+import utils.aoc.readLinesFromFile
+import utils.strings.splitAtIndex
+import utils.strings.toIntUsingDigitsOf
 
 fun main() {
     val sortedIds = readLinesFromFile("2020/day5.txt")

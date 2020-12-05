@@ -1,8 +1,8 @@
 package year2020
 
-import displayPart1
-import displayPart2
-import readLinesFromFile
+import utils.aoc.displayPart1
+import utils.aoc.displayPart2
+import utils.aoc.readLinesFromFile
 
 fun main() {
     val parsedInput = readLinesFromFile("2020/day2.txt").map(String::parse)

@@ -1,8 +1,7 @@
-package intcodeComputers
+package year2019.intcodeComputers
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
-import java.lang.invoke.MethodHandles.loop
 
 @ExperimentalCoroutinesApi
 class Program(
@@ -198,6 +197,7 @@ class InputOutputComputer(programInstructions: List<Long>) {
     private suspend fun drainOutput() = drainOutput(output)
 }
 
+@ExperimentalCoroutinesApi
 suspend fun drainOutput(channel: Channel<Long>): List<Long> {
     val outputs = ArrayList<Long>()
     while (!channel.isEmpty) {

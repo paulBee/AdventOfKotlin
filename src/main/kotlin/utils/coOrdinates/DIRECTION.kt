@@ -1,4 +1,4 @@
-package coOrdinates
+package utils.coOrdinates
 
 enum class DIRECTION {
     LEFT, RIGHT, UP, DOWN;

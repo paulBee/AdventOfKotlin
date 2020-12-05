@@ -1,5 +1,5 @@
 package year2019
-import readLinesFromFile
+import utils.aoc.readLinesFromFile
 import java.lang.IllegalStateException
 
 fun main() {
@@ -21,10 +21,6 @@ fun main() {
     println((youToCom.size + sanToCom.size) - (2 * sharedPath.size) - 2)
 
 
-
-}
-
-fun buildOrbitOf(objectName: String, distanceToCOM: Int, orbitInfo: List<OrbitalRelationship>) {
 
 }
 
