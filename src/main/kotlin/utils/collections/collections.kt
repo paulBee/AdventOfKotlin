@@ -39,3 +39,12 @@ fun <T> Sequence<T>.chunkWhen(fn: (T, T) -> Boolean) : Sequence<List<T>> =
 fun List<Number>.multiply() =
     this.map { it.toLong() }
         .reduce { acc, i -> acc * i  }
+
+/**
+ * iterates through the list providing each element and the remaining tail.
+ */
+fun <T> List<T>.scanHeadAndTail() =
+    generateSequence(this.headAndTail()) { (_, tail) -> tail.headAndTail() }
+        .takeWhile { (_, tail) -> tail.isNotEmpty() }
+
+fun <T> List<T>.headAndTail() = Pair(this.first(), this.drop(1))
