@@ -4,6 +4,7 @@ import displayPart1
 import displayPart2
 import readLinesFromFile
 import splitSize
+import kotlin.math.pow
 
 fun main() {
     val sortedIds = readLinesFromFile("2020/day5.txt")
@@ -26,17 +27,19 @@ val seatParser = toInt('L', 'R')
 fun boardingId(row: Int, seat: Int) = row * 8 + seat
 
 /**
- * parse a String to Int using arbitrary characters. Up to base 10
+ * parse a String to Int using arbitrary characters for any base
+ * all chars must be provided with the first being interpreted as 0, the second 1, and so on
  */
 fun toInt(vararg numberChars: Char): (String) -> Int {
 
-    if (numberChars.size > 10) throw IllegalArgumentException("String.toInt only supports up to base 10. Im not a goddam magician!")
-
     val validationRegex = numberChars.joinToString("", "^[", "]$").toRegex()
-    val digitLookup = numberChars.mapIndexed { index, c -> c to "$index" }.toMap()
+    val digitLookup = numberChars.mapIndexed { index, c -> c to index }.toMap()
+    val base = numberChars.size.toDouble()
 
     return { string ->
         if (validationRegex.matches(string)) throw RuntimeException("That is BAD intelligence! $string has chars other than ${numberChars.joinToString(", ")}")
-        string.map { digitLookup[it]!! }.joinToString("").toInt(numberChars.size)
+        string.reversed()
+            .map { digitLookup[it]!! }
+            .foldIndexed(0) { index, acc, next -> acc + next * base.pow(index).toInt() }
     }
 }
