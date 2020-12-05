@@ -1,5 +1,6 @@
 import java.io.File
 import java.io.Serializable
+import kotlin.math.pow
 
 fun readLinesFromFile(fileName: String): List<String> = readFile(fileName).readLines()
 
@@ -78,3 +79,22 @@ fun <T> Sequence<T>.chunkWhen(fn: (T, T) -> Boolean) : Sequence<List<T>> =
 fun List<Number>.multiply() =
     this.map { it.toLong() }
         .reduce { acc, i -> acc * i  }
+
+
+/**
+ * parse a String to Int using arbitrary characters for any base
+ * all chars must be provided with the first being interpreted as 0, the second 1, and so on
+ */
+fun toIntUsingDigitsOf(vararg numberChars: Char): (String) -> Int {
+
+    val validationRegex = numberChars.joinToString("", "^[", "]$").toRegex()
+    val digitLookup = numberChars.mapIndexed { index, c -> c to index }.toMap()
+    val base = numberChars.size.toDouble()
+
+    return { string ->
+        if (validationRegex.matches(string)) throw RuntimeException("That is BAD intelligence! $string has chars other than ${numberChars.joinToString(", ")}")
+        string.reversed()
+            .map { digitLookup[it]!! }
+            .foldIndexed(0) { index, acc, next -> acc + next * base.pow(index).toInt() }
+    }
+}
