@@ -2,6 +2,7 @@ package utils.aoc
 
 import java.io.File
 import java.io.Serializable
+import kotlin.random.Random
 
 fun readLinesFromFile(fileName: String): List<String> = readFile(fileName).readLines()
 
@@ -22,3 +23,5 @@ fun displayAnswer(part: AocPart): (Serializable) -> Unit {
 
 val displayPart1 = displayAnswer(AocPart.PART1)
 val displayPart2 = displayAnswer(AocPart.PART2)
+
+fun <T> pickRandom (vararg options: T) = options[Random.nextInt(0, options.size)]

@@ -48,3 +48,10 @@ fun <T> List<T>.scanHeadAndTail() =
         .takeWhile { (_, tail) -> tail.isNotEmpty() }
 
 fun <T> List<T>.headAndTail() = Pair(this.first(), this.drop(1))
+
+/**
+ * divide a list down the middle
+ */
+fun <T> List<T>.bifurcate() =
+    if (this.size % 2 != 0) throw RuntimeException("how odd! there seems to be a spare")
+    else Pair(this.take(this.size / 2), this.drop(this.size /2))
