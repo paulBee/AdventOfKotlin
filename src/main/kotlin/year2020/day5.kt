@@ -13,10 +13,6 @@ fun main() {
         .map { (row, seat) -> boardingId(row, seat)}
         .sorted().also { displayPart1(it.last()) }
 
-    val seats = readLinesFromFile("2020/day5.txt")
-        .map { it.fold(0) { acc, c -> acc shl 1 or (c.toInt() shr 2 xor 1 and 1) } }
-        .sorted()
-
     sortedIds
         .zipWithNext()
         .first { (first, second) -> second - first == 2 }
