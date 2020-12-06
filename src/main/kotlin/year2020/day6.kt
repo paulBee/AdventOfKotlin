@@ -10,7 +10,7 @@ fun main() {
         .chunkOnEmptyLine()
         .map { person -> person.map { it.asSequence().toSet()} }
 
-    groups.sumBy { group -> group.groupBy { it }.keys.size }.also(displayPart1)
-    groups.sumBy { group -> group.reduce { acc, next -> acc.intersect(next) }.size }.also(displayPart2)
+    groups.sumBy { group -> group.reduce { acc, next -> acc union next }.size }.also(displayPart1)
+    groups.sumBy { group -> group.reduce { acc, next -> acc intersect next }.size }.also(displayPart2)
 }
 
