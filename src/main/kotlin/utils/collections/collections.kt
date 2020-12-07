@@ -55,3 +55,16 @@ fun <T> List<T>.headAndTail() = Pair(this.first(), this.drop(1))
 fun <T> List<T>.bifurcate() =
     if (this.size % 2 != 0) throw RuntimeException("how odd! there seems to be a spare")
     else Pair(this.take(this.size / 2), this.drop(this.size /2))
+
+/**
+ * produces the list repeated the specified number of times
+ */
+fun <T> List<T>.repeated(number: Int): List<T> =
+    (1..number).fold(listOf<T>()) { acc, _ -> acc.plus(this) }
+
+/**
+ * returns all keys where the value matches a predicate
+ */
+fun <K,V> Map<K,V>.keysWhereValue(predicate: (V) -> Boolean) =
+    this.filter { (_, value) -> predicate(value) }
+        .map { (key) -> key }
