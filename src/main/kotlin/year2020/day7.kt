@@ -30,13 +30,13 @@ class BagHelper(inputs: List<String>) {
 data class NameAndNumber(val name: String, val number: Int)
 
 val numberAndName = """(\d+) ([a-z]+ [a-z]+) bag.*""".toRegex()
-fun parse(input: String): Pair<String, List<NameAndNumber>> {
-    val (name, rest) = input.split(" bags contain ")
-
-    return when (rest) {
-        "no other bags." -> name to emptyList()
-        else -> name to rest.split(", ")
+fun parse(input: String) =
+    input.split(" bags contain ")
+        .let { (name, rest) ->
+            name to
+            listOf(rest)
+                .filter { it != "no other bags." }
+                .flatMap { it.split(", ") }
                 .map { numberAndName.matchEntire(it)?.destructured ?: throw RuntimeException(it) }
                 .map {(number, name) -> NameAndNumber(name, number.toInt())}
-    }
-}
+        }
