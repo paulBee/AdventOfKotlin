@@ -1,0 +1,24 @@
+= AdventOfKotlin
+
+http://adventofcode.com/2020[Helping Elves] with https://kotlinlang.org/[Kotlin] since 2019
+
+2020
+
+|===
+|Puzzle |Solution
+
+|https://adventofcode.com/2020/day/1[Day 1: Report Repair]
+|https://github.com/paulBee/AdventOfKotlinblob/master/src/main/kotlin/year2020/day1.kt[Parts 1 & 2]
+|https://adventofcode.com/2020/day/2[Day 2: Password Philosophy]
+|https://github.com/paulBee/AdventOfKotlin/blob/master/src/main/kotlin/year2020/day2.kt[Parts 1 & 2]
+|https://adventofcode.com/2020/day/3[Day 3: Toboggan Trajectory]
+|https://github.com/paulBee/AdventOfKotlin/blob/master/src/main/kotlin/year2020/day3.kt[Parts 1 & 2]
+|https://adventofcode.com/2020/day/4[Day 4: Passport Processing]
+|https://github.com/paulBee/AdventOfKotlin/blob/master/src/main/kotlin/year2020/day4.kt[Parts 1 & 2]
+|https://adventofcode.com/2020/day/5[Day 5: Binary Boarding]
+|https://github.com/paulBee/AdventOfKotlin/blob/master/src/main/kotlin/year2020/day5.kt[Parts 1 & 2]
+|https://adventofcode.com/2020/day/6[Day 6: Custom Customs]
+|https://github.com/paulBee/AdventOfKotlin/blob/master/src/main/kotlin/year2020/day6.kt[Parts 1 & 2]
+|https://adventofcode.com/2020/day/7[Day 7: Handy Haversacks]
+|https://github.com/paulBee/AdventOfKotlin/blob/master/src/main/kotlin/year2020/day7.kt[Parts 1 & 2]
+|===
