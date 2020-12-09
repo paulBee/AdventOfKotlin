@@ -10,44 +10,51 @@ import utils.types.Right
 fun main() {
 
     val instructions = readLinesFromFile("2020/day8.txt").map { parseInstruction(it) }
+
     val initialState = State(0, 0, null)
 
-    when(val result = runToCompletion(instructions, initialState)) {
-        is Left -> displayPart1(result.value)
-        is Right -> println("The program unexpectedly completed with ${result.value}")
-    }
+    Runner(instructions).run(initialState).also { displayPart1(it.left!!) }
 
-    when(val result = runWithCorrection(instructions, initialState)) {
-        is Left -> println("No correction was found :(")
-        is Right -> displayPart2(result.value)
-    }
+    CorrectingRunner(instructions).run(initialState).also { displayPart2(it.right!!) }
 }
 
 data class State(val pointer: Int, val acc: Int, val previous: State?) {
+
+    fun next(operation: Operation) =
+        State(
+            this.pointer + operation.pointerChange(),
+            this.acc + operation.accChange(),
+            this
+        )
+
     fun hasVisited(pointer: Int): Boolean = previous?.pointer == pointer || previous?.hasVisited(pointer) ?: false
 }
 
-tailrec fun runToCompletion(operations: List<Operation>, state: State): Either<Int, Int> =
-    when {
-        state.hasVisited(state.pointer) -> Left(state.acc)
-        operations.size == state.pointer -> Right(state.acc)
-        else -> runToCompletion(operations, operations[state.pointer].next(state))
-    }
+class Runner(val operations: List<Operation>) {
 
-tailrec fun runWithCorrection(operations: List<Operation>, state: State): Either<Int, Int> =
-    when(val operation = operations[state.pointer]) {
-        is Accumulate -> Left(0)
-        is Jump -> runToCompletion(operations, operation.asNoOp().next(state))
-        is NoOp -> runToCompletion(operations, operation.asJump().next(state))
-    }
-    .asRight() ?: runWithCorrection(operations, operations[state.pointer].next(state))
+    tailrec fun run(state: State): Either<Int, Int> =
+        when {
+            state.hasVisited(state.pointer) -> Left(state.acc)
+            operations.size == state.pointer -> Right(state.acc)
+            else -> run(state.next(operations[state.pointer]))
+        }
+}
 
+class CorrectingRunner(val operations: List<Operation>) {
+    val runner = Runner(operations)
+
+    tailrec fun run(state: State): Either<Int, Int> =
+        when(val operation = operations[state.pointer]) {
+            is Accumulate -> Left(0)
+            is Jump -> runner.run(state.next(operation.asNoOp()))
+            is NoOp -> runner.run(state.next(operation.asJump()))
+        }
+            .asRight() ?: run(state.next(operations[state.pointer]))
+}
 
 sealed class Operation {
     open fun pointerChange() = 1
     open fun accChange() = 0
-
-    fun next(current: State) = State(current.pointer + pointerChange(), current.acc + accChange(), current)
 }
 
 class Accumulate(val argument: Int) : Operation() {
