@@ -24,56 +24,53 @@ fun main() {
 }
 
 data class State(val pointer: Int, val acc: Int, val previous: State?) {
-
-    fun next(instruction: Instruction): State = instruction.operation.next(this, instruction.argument)
-
     fun hasVisited(pointer: Int): Boolean = previous?.pointer == pointer || previous?.hasVisited(pointer) ?: false
 }
 
-fun runToCompletion(instructions: List<Instruction>, state: State): Either<Int, Int> =
+fun runToCompletion(operations: List<Operation>, state: State): Either<Int, Int> =
     when {
         state.hasVisited(state.pointer) -> Left(state.acc)
-        instructions.size == state.pointer -> Right(state.acc)
-        else -> runToCompletion(instructions, state.next(instructions[state.pointer]))
+        operations.size == state.pointer -> Right(state.acc)
+        else -> runToCompletion(operations, operations[state.pointer].next(state))
     }
 
-fun runWithCorrection(instructions: List<Instruction>, state: State): Either<Int, Int> =
-    instructions[state.pointer].let {
-        when(it.operation) {
-            is Accumulate -> runWithCorrection(instructions, state.next(it))
-            is Jump -> runToCompletion(instructions, state.next(Instruction(NoOp, it.argument))).asRight() ?: runWithCorrection(instructions, state.next(it))
-            is NoOp -> runToCompletion(instructions, state.next(Instruction(Jump, it.argument))).asRight() ?: runWithCorrection(instructions, state.next(it))
-        }
+fun runWithCorrection(operations: List<Operation>, state: State): Either<Int, Int> =
+    when(val operation = operations[state.pointer]) {
+        is Accumulate -> Left(0)
+        is Jump -> runToCompletion(operations, operation.asNoOp().next(state))
+        is NoOp -> runToCompletion(operations, operation.asJump().next(state))
     }
+    .asRight() ?: runWithCorrection(operations, operations[state.pointer].next(state))
+
 
 sealed class Operation {
-    abstract fun next(current: State, argument: Int): State
+    open fun pointerChange() = 1
+    open fun accChange() = 0
+
+    fun next(current: State) = State(current.pointer + pointerChange(), current.acc + accChange(), current)
 }
 
-object Accumulate : Operation() {
-    override fun next(current: State, argument: Int) =
-        State(current.pointer + 1, current.acc + argument, current)
+class Accumulate(val argument: Int) : Operation() {
+    override fun accChange() = argument
 }
 
-object Jump : Operation() {
-    override fun next(current: State, argument: Int) =
-        State(current.pointer + argument, current.acc, current)
+class Jump(val argument: Int) : Operation() {
+    override fun pointerChange() = argument
+    fun asNoOp() = NoOp(argument)
 }
 
-object NoOp : Operation() {
-    override fun next(current: State, argument: Int) =
-        State(current.pointer + 1, current.acc, current)
+class NoOp(val argument: Int) : Operation() {
+    fun asJump() = Jump(argument)
 }
 
-data class Instruction(val operation: Operation, val argument: Int) {}
 val instructionRegex = "(\\w+) ([+-]\\d+)".toRegex()
-fun parseInstruction(string: String): Instruction {
+fun parseInstruction(string: String): Operation {
     val (code, digit) = instructionRegex.matchEntire(string)?.destructured ?: throw RuntimeException(string)
     val value = digit.toInt()
     return when (code.toLowerCase()) {
-        "acc" -> Instruction(Accumulate, value)
-        "jmp" -> Instruction(Jump, value)
-        "nop" -> Instruction(NoOp, value)
+        "acc" -> Accumulate(value)
+        "jmp" -> Jump(value)
+        "nop" -> NoOp(value)
         else -> throw RuntimeException("Unsupported operation $code")
     }
 }
