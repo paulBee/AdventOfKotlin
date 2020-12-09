@@ -41,14 +41,8 @@ fun runWithCorrection(instructions: List<Instruction>, state: State): Either<Int
     instructions[state.pointer].let {
         when(it.operation) {
             is Accumulate -> runWithCorrection(instructions, state.next(it))
-            is Jump -> when (val result = runToCompletion(instructions, state.next(Instruction(NoOp, it.argument)))) {
-                is Left -> runWithCorrection(instructions, state.next(it))
-                is Right -> result
-            }
-            is NoOp -> when (val result = runToCompletion(instructions, state.next(Instruction(Jump, it.argument)))) {
-                is Left -> runWithCorrection(instructions, state.next(it))
-                is Right -> result
-            }
+            is Jump -> runToCompletion(instructions, state.next(Instruction(NoOp, it.argument))).asRight() ?: runWithCorrection(instructions, state.next(it))
+            is NoOp -> runToCompletion(instructions, state.next(Instruction(Jump, it.argument))).asRight() ?: runWithCorrection(instructions, state.next(it))
         }
     }
 

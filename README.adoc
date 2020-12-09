@@ -21,4 +21,8 @@ http://adventofcode.com/2020[Helping Elves] with https://kotlinlang.org/[Kotlin]
 |https://github.com/paulBee/AdventOfKotlin/blob/master/src/main/kotlin/year2020/day6.kt[Parts 1 & 2]
 |https://adventofcode.com/2020/day/7[Day 7: Handy Haversacks]
 |https://github.com/paulBee/AdventOfKotlin/blob/master/src/main/kotlin/year2020/day7.kt[Parts 1 & 2]
+|https://adventofcode.com/2020/day/8[Day 8: Handheld Halting]
+|https://github.com/paulBee/AdventOfKotlin/blob/master/src/main/kotlin/year2020/day8.kt[Parts 1 & 2]
+|https://adventofcode.com/2020/day/9[Day 9: Encoding Error]
+|https://github.com/paulBee/AdventOfKotlin/blob/master/src/main/kotlin/year2020/day9.kt[Parts 1 & 2]
 |===
