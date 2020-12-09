@@ -27,14 +27,14 @@ data class State(val pointer: Int, val acc: Int, val previous: State?) {
     fun hasVisited(pointer: Int): Boolean = previous?.pointer == pointer || previous?.hasVisited(pointer) ?: false
 }
 
-fun runToCompletion(operations: List<Operation>, state: State): Either<Int, Int> =
+tailrec fun runToCompletion(operations: List<Operation>, state: State): Either<Int, Int> =
     when {
         state.hasVisited(state.pointer) -> Left(state.acc)
         operations.size == state.pointer -> Right(state.acc)
         else -> runToCompletion(operations, operations[state.pointer].next(state))
     }
 
-fun runWithCorrection(operations: List<Operation>, state: State): Either<Int, Int> =
+tailrec fun runWithCorrection(operations: List<Operation>, state: State): Either<Int, Int> =
     when(val operation = operations[state.pointer]) {
         is Accumulate -> Left(0)
         is Jump -> runToCompletion(operations, operation.asNoOp().next(state))
