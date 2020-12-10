@@ -40,6 +40,9 @@ fun List<Number>.multiply() =
     this.map { it.toLong() }
         .reduce { acc, i -> acc * i  }
 
+
+fun <T> List<T>.sumLongBy(fn: (T) -> Long): Long = this.map{ fn(it) }.fold(0L) { acc, next -> acc + next }
+
 /**
  * iterates through the list providing each element and the remaining tail.
  */

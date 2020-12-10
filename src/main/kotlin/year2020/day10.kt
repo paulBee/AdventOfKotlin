@@ -3,9 +3,8 @@ package year2020
 import utils.aoc.displayPart1
 import utils.aoc.displayPart2
 import utils.aoc.readLinesFromFile
-import utils.collections.chunkWhen
-import utils.collections.multiply
 import utils.collections.scanHeadAndTail
+import utils.collections.sumLongBy
 
 fun main () {
     val options = readLinesFromFile("2020/day10.txt")
@@ -31,5 +30,3 @@ fun Map<Long, List<Long>>.combinationsFrom(adapter: Long, cache: MutableMap<Long
     cache.getOrPut(adapter) {
         this[adapter]?.sumLongBy { this.combinationsFrom(it, cache) } ?: 1L
     }
-
-fun <T> List<T>.sumLongBy(fn: (T) -> Long): Long = this.map{ fn(it) }.fold(0L) { acc, next -> acc + next }
