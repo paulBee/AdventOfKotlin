@@ -25,4 +25,6 @@ http://adventofcode.com/2020[Helping Elves] with https://kotlinlang.org/[Kotlin]
 |https://github.com/paulBee/AdventOfKotlin/blob/master/src/main/kotlin/year2020/day8.kt[Parts 1 & 2]
 |https://adventofcode.com/2020/day/9[Day 9: Encoding Error]
 |https://github.com/paulBee/AdventOfKotlin/blob/master/src/main/kotlin/year2020/day9.kt[Parts 1 & 2]
+|https://adventofcode.com/2020/day/10[Day 10: Adapter Array]
+|https://github.com/paulBee/AdventOfKotlin/blob/master/src/main/kotlin/year2020/day10.kt[Parts 1 & 2]
 |===
