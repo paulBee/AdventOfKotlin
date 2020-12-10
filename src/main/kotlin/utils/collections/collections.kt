@@ -71,3 +71,5 @@ fun <T> List<T>.repeated(number: Int): List<T> =
 fun <K,V> Map<K,V>.keysWhereValue(predicate: (V) -> Boolean) =
     this.filter { (_, value) -> predicate(value) }
         .map { (key) -> key }
+
+fun <K,V> Map<K, List<V>>.occurrencesOf(number: K) = this[number]?.size ?: 0

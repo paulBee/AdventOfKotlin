@@ -3,6 +3,7 @@ package year2020
 import utils.aoc.displayPart1
 import utils.aoc.displayPart2
 import utils.aoc.readLinesFromFile
+import utils.collections.occurrencesOf
 import utils.collections.scanHeadAndTail
 import utils.collections.sumLongBy
 import kotlin.math.absoluteValue
@@ -31,9 +32,7 @@ typealias Adapter = Long
 fun Adapter.differenceTo(adapter: Adapter) = (this - adapter).absoluteValue
 fun Adapter.isCompatibleWith(adapter: Adapter) = this.differenceTo(adapter) <= 3
 
-fun <T> Map<Long, List<T>>.occurrencesOf(number: Long) = this[number]?.size ?: 0
-
-fun Map<Long, List<Long>>.combinationsFrom(adapter: Long, cache: MutableMap<Long, Long> = mutableMapOf()): Long =
+fun Map<Adapter, List<Adapter>>.combinationsFrom(adapter: Adapter, cache: MutableMap<Adapter, Long> = mutableMapOf()): Long =
     cache.getOrPut(adapter) {
         this[adapter]?.sumLongBy { this.combinationsFrom(it, cache) } ?: 1L
     }
