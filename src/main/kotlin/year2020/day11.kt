@@ -5,43 +5,64 @@ import utils.aoc.displayPart2
 import utils.aoc.readLinesFromFile
 import utils.collections.productOf
 import utils.collections.takeWhileInclusive
+import utils.collections.untilStable
+import java.lang.StringBuilder
 
 fun main() {
-    val input = readLinesFromFile("2020/day11.txt")
 
-    generateSequence(input.asLoungeWithTolerance(4)) { it.iterateByAdjacent() }
-        .untilStable()
-        .also { displayPart1(it.numberOfOccupiedChairs()) }
-
-    generateSequence(input.asLoungeWithTolerance(5)) { it.iterateByLineOfSight().also { it.print() } }
-        .untilStable()
-        .also { displayPart2(it.numberOfOccupiedChairs()) }
+    AirportLoungeSimulator(4, 1).simulate().also { displayPart1(it.numberOfOccupiedChairs()) }
+    AirportLoungeSimulator(5).simulate().also { displayPart2(it.numberOfOccupiedChairs()) }
 
 }
-typealias AirportLounge = Map<Coord, Position>
 
-private fun Sequence<AirportLounge>.untilStable(): AirportLounge =
-    this.zipWithNext()
-        .takeWhileInclusive { (a, b) -> a != b }
-        .last().let { (it) -> it }
+class AirportLoungeSimulator(tolerance: Int, private val sightLimit: Int = Int.MAX_VALUE) {
 
-fun AirportLounge.iterateByAdjacent(): AirportLounge =
-    this.map { (coord, position) ->
-        coord to
-        position.next(coord.linesOfSight().count {
-            it.map { this[it] } .take(1).any { it?.isOccupied() ?: false }
-        })
-    }.toMap()
+    private val initialLounge = readLinesFromFile("2020/day11.txt").asLoungeWithTolerance(tolerance, sightLimit)
 
-fun AirportLounge.iterateByLineOfSight(): AirportLounge =
-    this.map { (coord, position) ->
-        coord to
-                position.next(coord.linesOfSight().count {
-                    it.map { this[it] } .takeWhileInclusive { it is Floor }.any { it?.isOccupied() ?: false }
-                })
-    }.toMap()
+    fun simulate(): AirportLounge = generateSequence(initialLounge) { it.iterate() }.untilStable()
+}
 
-fun AirportLounge.numberOfOccupiedChairs() = this.values.count { it.isOccupied() }
+class AirportLounge (private val floorplan: Map<Coord, Position>, val sightLength: Int) {
+
+    fun iterate(): AirportLounge =
+        floorplan.mapValues { (coord, position) ->
+
+            val occupiedChairs = coord.linesOfSight().count { los -> positionFromSequence(los)?.isOccupied() ?: false }
+
+            position.next(occupiedChairs)
+
+        }.let { AirportLounge(it.toMap(), sightLength) }
+
+    fun numberOfOccupiedChairs() = floorplan.values.count { it.isOccupied() }
+
+    private fun positionFromSequence(coords: Sequence<Coord>): Position? =
+        coords.map { floorplan[it] }
+            .takeWhileInclusive { it is Floor }
+            .take(sightLength)
+            .last()
+
+    override fun equals(other: Any?): Boolean {
+        return other is AirportLounge && floorplan == other.floorplan
+    }
+
+    override fun toString(): String {
+        val maxX: Int = floorplan.keys.map { (x) -> x }.maxOrNull() ?: 0
+        val maxY: Int = floorplan.keys.map { (_, y) -> y }.maxOrNull() ?: 0
+
+        val sb = StringBuilder()
+
+        (0..maxY).forEach { y -> sb.append((0..maxX).joinToString("") { x -> floorplan[Coord(x, y)]?.toString() ?: "" }) }
+        sb.append("\n")
+
+        return sb.toString()
+    }
+
+    override fun hashCode(): Int {
+        var result = floorplan.hashCode()
+        result = 31 * result + sightLength
+        return result
+    }
+}
 
 fun Char.asChairOrFloor(chairTolerance: Int) = when(this) {
     '.' -> Floor
@@ -86,25 +107,8 @@ data class Coord(val x: Int, val y: Int) {
     fun linesOfSight() = allDirections.map { direction ->
         generateSequence(this.stepInDirection(direction)) { it.stepInDirection(direction) }
     }
-
-    fun adjacentCoords() =
-        productOf(x-1..x+1, y-1..y+1)
-            .map { (x, y) -> Coord(x, y) }
-            .filter { it != this}
 }
 
-fun List<String>.asLoungeWithTolerance(tolerance: Int) =
+fun List<String>.asLoungeWithTolerance(tolerance: Int, sightLength: Int) =
     this.flatMapIndexed { y, row -> row.mapIndexed() { x, char ->  Coord(x, y) to char.asChairOrFloor(tolerance) } }
-        .toMap()
-
-
-fun Map<Coord, Position>.print() {
-    val maxX: Int = this.keys.map { (x) -> x }.maxOrNull() ?: 0
-    val maxY: Int = this.keys.map { (_, y) -> y }.maxOrNull() ?: 0
-
-    println()
-    (0..maxY).forEach { y ->
-        println((0..maxX).map {x -> this[Coord(x, y)]!!.toString() }.joinToString(""))
-    }
-    println()
-}
+        .let { AirportLounge(it.toMap(), sightLength)}

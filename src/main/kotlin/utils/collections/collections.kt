@@ -42,6 +42,11 @@ fun <T> Sequence<T>.takeWhileInclusive(pred: (T) -> Boolean): Sequence<T> {
     }
 }
 
+fun <T> Sequence<T>.untilStable(): T =
+    this.zipWithNext()
+        .takeWhileInclusive { (a, b) -> a != b }
+        .last().let { (it) -> it }
+
 /**
  * produces the product of a list of numbers, converts them to Long to reduce overflow issues
  */
