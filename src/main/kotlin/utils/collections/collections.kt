@@ -33,6 +33,15 @@ fun <T> Sequence<T>.chunkWhen(fn: (T, T) -> Boolean) : Sequence<List<T>> =
         yield(chunk)
     }
 
+fun <T> Sequence<T>.takeWhileInclusive(pred: (T) -> Boolean): Sequence<T> {
+    var previousResult = true
+    return takeWhile {
+        val shouldStop = previousResult
+        pred(it).also { thisResult -> previousResult = thisResult }
+        shouldStop
+    }
+}
+
 /**
  * produces the product of a list of numbers, converts them to Long to reduce overflow issues
  */
