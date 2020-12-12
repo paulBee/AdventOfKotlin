@@ -1,10 +1,9 @@
 package year2019.robots
 
-import utils.navigation.Coordinate
-import utils.navigation.DIRECTION
 import year2019.intcodeComputers.Program
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
+import utils.navigation.*
 import year2019.misc.COLOUR
 
 @ExperimentalCoroutinesApi
@@ -17,7 +16,7 @@ class PaintingRobot(programInstructions: List<Long>, initialWhite: Map<Coordinat
 
     private val paintLocations = initialWhite.toMutableMap()
     private var currentLocation = Coordinate(0,0)
-    private var currentDirection = DIRECTION.UP
+    private var currentDirection: Direction = Up
 
     var inputsSent = 0
 
@@ -44,10 +43,10 @@ class PaintingRobot(programInstructions: List<Long>, initialWhite: Map<Coordinat
         roboEyes.send(colourOfCurrentSquare().toLong())
     }
 
-    private fun paintAndMove(it: Pair<COLOUR, DIRECTION>) {
-        val (colour, direction) = it
+    private fun paintAndMove(it: Pair<COLOUR, Rotation>) {
+        val (colour, rotation) = it
         paintSquare(colour)
-        turnAndMoveForward(direction)
+        turnAndMoveForward(rotation)
     }
 
     private fun colourOfCurrentSquare() = paintLocations.getOrDefault(currentLocation, COLOUR.BLACK)
@@ -56,18 +55,18 @@ class PaintingRobot(programInstructions: List<Long>, initialWhite: Map<Coordinat
         paintLocations[currentLocation] = colour
     }
 
-    private fun turnAndMoveForward(direction: DIRECTION) {
-        currentDirection = currentDirection.turn(direction)
+    private fun turnAndMoveForward(rotation: Rotation) {
+        currentDirection = currentDirection.rotate(rotation)
         currentLocation = currentLocation.moveDistance(currentDirection, 1)
     }
 
-    private suspend fun gatherNextInstructions(): List<Pair<COLOUR, DIRECTION>> {
+    private suspend fun gatherNextInstructions(): List<Pair<COLOUR, Rotation>> {
 
         waitForAnInput()
 
         return drainOutput()
             .chunked(2)
-            .map { Pair(it[0].toColour(), it[1].toDirection()) }
+            .map { Pair(it[0].toColour(), it[1].toRotation()) }
     }
 
     private suspend fun drainOutput(): ArrayList<Long> {
@@ -92,10 +91,10 @@ class PaintingRobot(programInstructions: List<Long>, initialWhite: Map<Coordinat
 
     fun whereHaveYouPainted(): Map<Coordinate, COLOUR> = paintLocations
 
-    private fun Long.toDirection() =
+    private fun Long.toRotation(): Rotation =
         when (this) {
-            0L -> DIRECTION.LEFT
-            1L -> DIRECTION.RIGHT
+            0L -> Left
+            1L -> Right
             else -> throw IllegalStateException("$this I cant turn that way. Im just a robot :(")
         }
 

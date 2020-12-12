@@ -7,6 +7,7 @@ import utils.aoc.pickRandom
 import utils.aoc.readLinesFromFile
 import utils.collections.bifurcate
 import utils.collections.productOf
+import utils.navigation.Coordinate
 import utils.strings.splitAtIndex
 import utils.strings.toIntUsingDigitsOf
 import java.lang.Exception
@@ -140,8 +141,8 @@ interface WearyLoad {
 }
 
 interface Savvy {
-    fun translateBoardingPassToCoord(boardingPass: String): Pair<Int, Int> =
-        boardingPass.splitAtIndex(7).let { (rowPart, seatPart) -> Pair(rowParser(rowPart), seatParser(seatPart)) }
+    fun translateBoardingPassToCoord(boardingPass: String): Coordinate =
+        boardingPass.splitAtIndex(7).let { (rowPart, seatPart) -> Coordinate(rowParser(rowPart), seatParser(seatPart)) }
 }
 
 interface Visitor {
@@ -158,7 +159,7 @@ interface BoardingPassOwner {
 interface Flyer: WearyLoad, Visitor, BoardingPassOwner
 
 interface SeatingArea {
-    fun seatAt(coord: Pair<Int, Int>): Seat?
+    fun seatAt(coord: Coordinate): Seat?
 }
 
 interface OrderedSeatingArea: SeatingArea {
@@ -173,10 +174,10 @@ interface Usher {
 class Aeroplane(length: Int, width: Int): Location, OrderedSeatingArea {
 
     private val seats = productOf(0 until length, 0 until width)
-        .associate { (colNum, seatNum) -> Pair(colNum, seatNum) to Seat(colNum, seatNum) }
+        .associate { (colNum, seatNum) -> Coordinate(colNum, seatNum) to Seat(colNum, seatNum) }
 
     private val orderedSeats = seats.entries
-        .sortedWith(compareBy({ it.key.first }, { it.key.second } ))
+        .sortedWith(compareBy({ it.key.x }, { it.key.y } ))
         .map { it.value }
 
     private var hasWalls = false
@@ -187,7 +188,7 @@ class Aeroplane(length: Int, width: Int): Location, OrderedSeatingArea {
 
     override fun seatsFromEnd(): Sequence<Seat> = orderedSeats.asReversed().asSequence().filter { !it.isDismantled }
 
-    override fun seatAt(coord: Pair<Int, Int>) = seats[coord]
+    override fun seatAt(coord: Coordinate) = seats[coord]
 
     override fun welcome(visitor: Visitor) {
         when (visitor) {
@@ -342,7 +343,7 @@ class FrequentFlyer (val boardingPass: String) : Flyer, Savvy {
         val seat = area.seatAt(mySeatLocation) ?: throw RuntimeException("Am I even on this plane?")
         lowerOnTo(seat)
         luggage?.also {
-            val possibleLuggageSpot = Pair(mySeatLocation.first, mySeatLocation.second + 1)
+            val possibleLuggageSpot = Coordinate(mySeatLocation.x, mySeatLocation.y + 1)
             area.seatAt(possibleLuggageSpot)?.also { spareSeat -> if (!spareSeat.isTaken()) luggage.lowerOnTo(spareSeat) }
         }
     }

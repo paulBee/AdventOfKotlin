@@ -1,10 +1,7 @@
 package year2019
 
-import utils.navigation.Coordinate
-import utils.navigation.MoveInstruction
-import utils.navigation.theOrigin
-import utils.navigation.toMoveInstruction
 import utils.aoc.readLinesFromFile
+import utils.navigation.*
 
 fun main () {
     val (moveInstructions1, moveInstructions2) = getWireInstructions()
@@ -47,3 +44,18 @@ fun getWireInstructions() : Pair<List<MoveInstruction>, List<MoveInstruction>> {
 
 fun inputLineToMoveInstructions(line: String) =
     line.split(",").map { it.toMoveInstruction() }
+
+data class MoveInstruction (val direction : Direction, val distance : Int)
+
+val moveRegex = """^([UDRL])(\d+)$""".toRegex()
+fun String.toMoveInstruction() : MoveInstruction {
+    val (direction, distance) =
+        moveRegex.matchEntire(this)
+            ?.destructured
+            ?: throw IllegalArgumentException("String $this does not match regex")
+
+    return MoveInstruction(direction = direction.toDirection(), distance = distance.toInt())
+}
+
+fun Coordinate.coordsInDirection(moveInstruction: MoveInstruction) : List<Coordinate> =
+    (1..moveInstruction.distance).map { moveDistance(moveInstruction.direction, it) }

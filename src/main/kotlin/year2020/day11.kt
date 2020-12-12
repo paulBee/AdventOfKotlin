@@ -3,9 +3,11 @@ package year2020
 import utils.aoc.displayPart1
 import utils.aoc.displayPart2
 import utils.aoc.readLinesFromFile
-import utils.collections.productOf
 import utils.collections.takeWhileInclusive
 import utils.collections.untilStable
+import utils.navigation.Coordinate
+import utils.navigation.diagonalDirections
+import utils.navigation.orthogonalDirections
 import java.lang.StringBuilder
 
 fun main() {
@@ -15,14 +17,14 @@ fun main() {
 
 }
 
-class AirportLoungeSimulator(tolerance: Int, private val sightLimit: Int = Int.MAX_VALUE) {
+class AirportLoungeSimulator(tolerance: Int, sightLimit: Int = Int.MAX_VALUE) {
 
     private val initialLounge = readLinesFromFile("2020/day11.txt").asLoungeWithTolerance(tolerance, sightLimit)
 
     fun simulate(): AirportLounge = generateSequence(initialLounge) { it.iterate() }.untilStable()
 }
 
-class AirportLounge (private val floorplan: Map<Coord, Position>, val sightLength: Int) {
+class AirportLounge (private val floorplan: Map<Coordinate, LoungeSpace>, private val sightLength: Int) {
 
     fun iterate(): AirportLounge =
         floorplan.mapValues { (coord, position) ->
@@ -35,7 +37,7 @@ class AirportLounge (private val floorplan: Map<Coord, Position>, val sightLengt
 
     fun numberOfOccupiedChairs() = floorplan.values.count { it.isOccupied() }
 
-    private fun positionFromSequence(coords: Sequence<Coord>): Position? =
+    private fun positionFromSequence(coords: Sequence<Coordinate>): LoungeSpace? =
         coords.map { floorplan[it] }
             .takeWhileInclusive { it is Floor }
             .take(sightLength)
@@ -51,7 +53,7 @@ class AirportLounge (private val floorplan: Map<Coord, Position>, val sightLengt
 
         val sb = StringBuilder()
 
-        (0..maxY).forEach { y -> sb.append((0..maxX).joinToString("") { x -> floorplan[Coord(x, y)]?.toString() ?: "" }) }
+        (0..maxY).forEach { y -> sb.append((0..maxX).joinToString("") { x -> floorplan[Coordinate(x, y)]?.toString() ?: "" }) }
         sb.append("\n")
 
         return sb.toString()
@@ -70,11 +72,11 @@ fun Char.asChairOrFloor(chairTolerance: Int) = when(this) {
     else -> throw RuntimeException("$this is neither chair nor floor")
 }
 
-sealed class Position {
+sealed class LoungeSpace {
     abstract fun isOccupied(): Boolean
-    abstract fun next(occupiedNeighbours: Int): Position
+    abstract fun next(occupiedNeighbours: Int): LoungeSpace
 }
-data class Chair(val occupied: Boolean, val tolerance: Int): Position() {
+data class Chair(val occupied: Boolean, val tolerance: Int): LoungeSpace() {
     override fun isOccupied() = occupied
     override fun next(occupiedNeighbours: Int) =
         when  {
@@ -86,29 +88,15 @@ data class Chair(val occupied: Boolean, val tolerance: Int): Position() {
     override fun toString() = if (occupied) "#" else "L"
 }
 
-object Floor: Position() {
+object Floor: LoungeSpace() {
     override fun isOccupied() = false
     override fun next(occupiedNeighbours: Int) = Floor
 
     override fun toString() = "."
 }
 
-
-data class Direction(val deltaX: Int, val deltaY: Int)
-
-val allDirections = productOf(-1..1, -1..1)
-    .filter { (x, y) -> x != 0 || y != 0 }
-    .map{ (x, y) -> Direction(x, y) }
-
-data class Coord(val x: Int, val y: Int) {
-
-    fun stepInDirection(direction: Direction): Coord = Coord(x + direction.deltaX, y + direction.deltaY)
-
-    fun linesOfSight() = allDirections.map { direction ->
-        generateSequence(this.stepInDirection(direction)) { it.stepInDirection(direction) }
-    }
-}
+fun Coordinate.linesOfSight() = orthogonalDirections.plus(diagonalDirections).map { it.sequenceFrom(this).drop(1) }
 
 fun List<String>.asLoungeWithTolerance(tolerance: Int, sightLength: Int) =
-    this.flatMapIndexed { y, row -> row.mapIndexed() { x, char ->  Coord(x, y) to char.asChairOrFloor(tolerance) } }
+    this.flatMapIndexed { y, row -> row.mapIndexed() { x, char ->  Coordinate(x, y) to char.asChairOrFloor(tolerance) } }
         .let { AirportLounge(it.toMap(), sightLength)}

@@ -1,6 +1,7 @@
 package year2020
 
 import utils.aoc.displayPart1
+import utils.aoc.displayPart2
 import utils.aoc.readLinesFromFile
 import utils.collections.multiply
 import utils.collections.scanHeadAndTail
@@ -11,7 +12,7 @@ fun main() {
         .sorted()
 
     findNumbersSummingTo(2020, numbers, 2)?.multiply()?.also(displayPart1)
-    findNumbersSummingTo(2020, numbers, 3)?.multiply()?.also(displayPart1)
+    findNumbersSummingTo(2020, numbers, 3)?.multiply()?.also(displayPart2)
 }
 
 fun findNumbersSummingTo(sumTotal: Long, optionsForDigits: List<Long>, digitsInSum: Int): List<Long>? {

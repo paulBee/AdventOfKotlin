@@ -1,47 +1,32 @@
 package utils.navigation
 
 import utils.algorithm.highestCommonFactor
-import year2020.Rotate
 import java.lang.IllegalStateException
 import kotlin.math.abs
 
 data class Coordinate(val x : Int, val y : Int) {
 
-    fun coordsInDirection(moveInstruction: MoveInstruction) : List<Coordinate> =
-        (1..moveInstruction.distance)
-            .map { moveDistance(moveInstruction.direction, it) }
-
-    fun moveDistance(direction: DIRECTION, it: Int): Coordinate {
-        return when (direction) {
-            DIRECTION.UP -> Coordinate(x, y - it)
-            DIRECTION.DOWN -> Coordinate(x, y + it)
-            DIRECTION.LEFT -> Coordinate(x - it, y)
-            DIRECTION.RIGHT -> Coordinate(x + it, y)
-        }
-    }
+    fun moveDistance(direction: Direction, it: Int): Coordinate =
+        generateSequence(this) { direction.moveFrom(it) }.elementAt(it)
 
     fun move(dx: Int, dy: Int) = Coordinate(x + dx, y + dy)
 
-    fun rotate(rotate: Rotate) =
+    fun rotate(rotate: Rotation) =
         when (rotate) {
-            Rotate.Left -> Coordinate(y, -x)
-            Rotate.Right -> Coordinate(-y, x)
+            Left -> Coordinate(y, -x)
+            Right -> Coordinate(-y, x)
+            else -> throw RuntimeException("Unsupported Rotation")
         }
 
-    fun manhattanDistanceTo(other: Coordinate): Int =
-        abs(this.x - other.x) + abs(this.y - other.y)
+    fun manhattanDistanceTo(other: Coordinate): Int = abs(this.x - other.x) + abs(this.y - other.y)
+    fun manhattanDisplacement() = manhattanDistanceTo(theOrigin)
 
     fun isOrigin(): Boolean = this == theOrigin
 
-    fun follow(direction: DirectionRatio) = Coordinate(this.x + direction.deltaX, this.y + direction.deltaY)
-    fun allAdjacent() = listOf(
-        Coordinate(this.x - 1, this.y),
-        Coordinate(this.x + 1, this.y),
-        Coordinate(this.x, this.y - 1),
-        Coordinate(this.x, this.y + 1)
-    )
+    fun follow(direction: DirectionRatio) = move(direction.deltaX, direction.deltaY)
 
-    fun manhattanDisplacement() = manhattanDistanceTo(theOrigin)
+    fun allAdjacent(): List<Coordinate> = orthogonalDirections.map { it.moveFrom(this) }
+
 }
 
 val theOrigin = Coordinate(0, 0)

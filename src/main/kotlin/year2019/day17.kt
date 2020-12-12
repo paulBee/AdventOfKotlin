@@ -1,12 +1,11 @@
 package year2019
 
 import utils.collections.chunkWhen
-import utils.navigation.Coordinate
-import utils.navigation.DIRECTION
 import year2019.intcodeComputers.Program
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import utils.aoc.readProgramInstructions
+import utils.navigation.*
 
 @ExperimentalCoroutinesApi
 suspend fun main() {
@@ -44,16 +43,16 @@ fun part2Diagnostics(pixels: Map<Coordinate, String>) {
         .find { it.value == "^" }?.key
         ?: throw RuntimeException("this is not the droid you are looking for")
 
-    val startingDirection = DIRECTION.UP
+    val startingDirection: Direction = Up
 
     val pathString = followPath(startingCoordinate, startingDirection, pixels)
 
     print(pathString)
 }
 
-fun followPath(coordinate: Coordinate, direction: DIRECTION, pixels: Map<Coordinate, String>, paths: List<String> = emptyList()): List<String> {
-    val leftDir = direction.turn(DIRECTION.LEFT)
-    val rightDir = direction.turn(DIRECTION.RIGHT)
+fun followPath(coordinate: Coordinate, direction: Direction, pixels: Map<Coordinate, String>, paths: List<String> = emptyList()): List<String> {
+    val leftDir = direction.rotate(Left)
+    val rightDir = direction.rotate(Right)
     return when {
         pixels[coordinate.moveDistance(leftDir, 1)] == "#" -> {
             val (pathSection, newCoord) = follow(coordinate, leftDir, pixels)
@@ -115,7 +114,7 @@ private suspend fun part2PostHuman() {
 
 private fun follow(
     coordinate: Coordinate,
-    rightDir: DIRECTION,
+    rightDir: Direction,
     pixels: Map<Coordinate, String>
 ): Pair<Int, Coordinate> {
     val path = generateSequence(coordinate) { it.moveDistance(rightDir, 1) }

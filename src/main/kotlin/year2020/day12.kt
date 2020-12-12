@@ -29,8 +29,8 @@ class Navigator {
                     "S" -> boat.navigateByCompass(South, amount)
                     "E" -> boat.navigateByCompass(East, amount)
                     "W" -> boat.navigateByCompass(West, amount)
-                    "L" -> boat.navigateByRotation(Rotate.Left, amount/90)
-                    "R" -> boat.navigateByRotation(Rotate.Right, amount/90)
+                    "L" -> boat.navigateByRotation(Left, amount/90)
+                    "R" -> boat.navigateByRotation(Right, amount/90)
                     "F" -> boat.forwards(amount)
                     else -> throw RuntimeException("wtf is $letter")
                 }
@@ -40,7 +40,7 @@ class Navigator {
 
 interface Boat {
     fun navigateByCompass(compassDirection: Compass, amount: Int)
-    fun navigateByRotation(direction: Rotate, amount: Int)
+    fun navigateByRotation(direction: Rotation, amount: Int)
     fun forwards(amount: Int)
     fun currentLocation(): Coordinate
 }
@@ -52,7 +52,7 @@ class WaypointBoat(private var location: Coordinate, private var waypoint: Waypo
         waypoint = compassDirection.travel(waypoint, amount)
     }
 
-    override fun navigateByRotation(direction: Rotate, amount: Int) {
+    override fun navigateByRotation(direction: Rotation, amount: Int) {
         waypoint = generateSequence(waypoint) { it.rotate(direction) }.elementAt(amount)
     }
 
@@ -70,8 +70,8 @@ class DirectionalBoat(private var location: Coordinate, private var facing : Com
         location = compassDirection.travel(location, amount)
     }
 
-    override fun navigateByRotation(direction: Rotate, amount: Int) {
-        facing = generateSequence(facing) { it.turn(direction) }.elementAt(amount)
+    override fun navigateByRotation(direction: Rotation, amount: Int) {
+        facing = generateSequence(facing) { it.rotate(direction) }.elementAt(amount)
     }
 
     override fun forwards(amount: Int) = navigateByCompass(facing, amount)
