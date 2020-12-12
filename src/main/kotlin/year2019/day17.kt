@@ -1,8 +1,8 @@
 package year2019
 
 import utils.collections.chunkWhen
-import utils.coOrdinates.Coordinate
-import utils.coOrdinates.DIRECTION
+import utils.navigation.Coordinate
+import utils.navigation.DIRECTION
 import year2019.intcodeComputers.Program
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
@@ -55,11 +55,11 @@ fun followPath(coordinate: Coordinate, direction: DIRECTION, pixels: Map<Coordin
     val leftDir = direction.turn(DIRECTION.LEFT)
     val rightDir = direction.turn(DIRECTION.RIGHT)
     return when {
-        pixels[coordinate.moveDistanceNegativeUP(leftDir, 1)] == "#" -> {
+        pixels[coordinate.moveDistance(leftDir, 1)] == "#" -> {
             val (pathSection, newCoord) = follow(coordinate, leftDir, pixels)
             followPath(newCoord, leftDir, pixels, paths.plus("L$pathSection"))
         }
-        pixels[coordinate.moveDistanceNegativeUP(rightDir, 1)] == "#" -> {
+        pixels[coordinate.moveDistance(rightDir, 1)] == "#" -> {
             val (pathSection, newCoord) = follow(coordinate, rightDir, pixels)
             followPath(newCoord, rightDir, pixels, paths.plus("R$pathSection"))
         }
@@ -118,7 +118,7 @@ private fun follow(
     rightDir: DIRECTION,
     pixels: Map<Coordinate, String>
 ): Pair<Int, Coordinate> {
-    val path = generateSequence(coordinate) { it.moveDistanceNegativeUP(rightDir, 1) }
+    val path = generateSequence(coordinate) { it.moveDistance(rightDir, 1) }
         .drop(1)
         .takeWhile { pixels[it] == "#" }
         .toList()

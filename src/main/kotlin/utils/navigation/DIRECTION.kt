@@ -1,4 +1,4 @@
-package utils.coOrdinates
+package utils.navigation
 
 enum class DIRECTION {
     LEFT, RIGHT, UP, DOWN;

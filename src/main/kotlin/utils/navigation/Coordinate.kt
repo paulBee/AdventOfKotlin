@@ -1,6 +1,7 @@
-package utils.coOrdinates
+package utils.navigation
 
 import utils.algorithm.highestCommonFactor
+import year2020.Rotate
 import java.lang.IllegalStateException
 import kotlin.math.abs
 
@@ -12,21 +13,20 @@ data class Coordinate(val x : Int, val y : Int) {
 
     fun moveDistance(direction: DIRECTION, it: Int): Coordinate {
         return when (direction) {
-            DIRECTION.UP -> Coordinate(x, y + it)
-            DIRECTION.DOWN -> Coordinate(x, y - it)
-            DIRECTION.LEFT -> Coordinate(x - it, y)
-            DIRECTION.RIGHT -> Coordinate(x + it, y)
-        }
-    }
-
-    fun moveDistanceNegativeUP(direction: DIRECTION, it: Int): Coordinate {
-        return when (direction) {
             DIRECTION.UP -> Coordinate(x, y - it)
             DIRECTION.DOWN -> Coordinate(x, y + it)
             DIRECTION.LEFT -> Coordinate(x - it, y)
             DIRECTION.RIGHT -> Coordinate(x + it, y)
         }
     }
+
+    fun move(dx: Int, dy: Int) = Coordinate(x + dx, y + dy)
+
+    fun rotate(rotate: Rotate) =
+        when (rotate) {
+            Rotate.Left -> Coordinate(y, -x)
+            Rotate.Right -> Coordinate(-y, x)
+        }
 
     fun manhattanDistanceTo(other: Coordinate): Int =
         abs(this.x - other.x) + abs(this.y - other.y)
@@ -40,6 +40,8 @@ data class Coordinate(val x : Int, val y : Int) {
         Coordinate(this.x, this.y - 1),
         Coordinate(this.x, this.y + 1)
     )
+
+    fun manhattanDisplacement() = manhattanDistanceTo(theOrigin)
 }
 
 val theOrigin = Coordinate(0, 0)

@@ -1,6 +1,6 @@
 package year2019
 
-import utils.coOrdinates.Coordinate
+import utils.navigation.Coordinate
 import year2019.intcodeComputers.InputOutputComputer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

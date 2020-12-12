@@ -1,8 +1,8 @@
 package year2019
 
-import utils.coOrdinates.Coordinate
-import utils.coOrdinates.DirectionRatio
-import utils.coOrdinates.QUADRANT
+import utils.navigation.Coordinate
+import utils.navigation.DirectionRatio
+import utils.navigation.QUADRANT
 import utils.collections.productOf
 import utils.aoc.readLinesFromFile
 import java.lang.IllegalStateException

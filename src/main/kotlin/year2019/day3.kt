@@ -1,9 +1,9 @@
 package year2019
 
-import utils.coOrdinates.Coordinate
-import utils.coOrdinates.MoveInstruction
-import utils.coOrdinates.theOrigin
-import utils.coOrdinates.toMoveInstruction
+import utils.navigation.Coordinate
+import utils.navigation.MoveInstruction
+import utils.navigation.theOrigin
+import utils.navigation.toMoveInstruction
 import utils.aoc.readLinesFromFile
 
 fun main () {

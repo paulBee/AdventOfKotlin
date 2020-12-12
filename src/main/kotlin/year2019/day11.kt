@@ -1,6 +1,6 @@
 package year2019
 
-import utils.coOrdinates.Coordinate
+import utils.navigation.Coordinate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking

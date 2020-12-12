@@ -1,4 +1,4 @@
-package utils.coOrdinates
+package utils.navigation
 
 data class MoveInstruction (val direction : DIRECTION, val distance : Int)
 

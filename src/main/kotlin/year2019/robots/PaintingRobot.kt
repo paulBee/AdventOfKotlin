@@ -1,7 +1,7 @@
 package year2019.robots
 
-import utils.coOrdinates.Coordinate
-import utils.coOrdinates.DIRECTION
+import utils.navigation.Coordinate
+import utils.navigation.DIRECTION
 import year2019.intcodeComputers.Program
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel

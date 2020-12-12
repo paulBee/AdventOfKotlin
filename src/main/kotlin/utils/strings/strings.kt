@@ -31,3 +31,9 @@ fun toIntUsingDigitsOf(vararg numberChars: Char): (String) -> Int {
             .foldIndexed(0) { index, acc, next -> acc + next * base.pow(index).toInt() }
     }
 }
+
+val regex = Regex("(\\w)(\\d+)")
+fun String.toLetterAndNumber(): Pair<String, Int> {
+    val (letter, distance) = regex.matchEntire(this)?.destructured?: throw RuntimeException(this)
+    return letter to distance.toInt()
+}
