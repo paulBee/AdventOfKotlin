@@ -6,135 +6,152 @@ import utils.aoc.readLinesFromFile
 import kotlin.math.absoluteValue
 
 fun main() {
-    readLinesFromFile("2020/day12.txt")
-        .map { it.toLetterAndNumber() }
-        .fold(Boat(0, 0, East))
-        { boat, (instruction, amount) ->
-            when (instruction) {
-                "N" -> boat.move(North, amount)
-                "S" -> boat.move(South, amount)
-                "E" -> boat.move(East, amount)
-                "W" -> boat.move(West, amount)
-                "L" -> boat.turn(Left, amount)
-                "R" -> boat.turn(Right, amount)
-                "F" -> boat.advance(amount)
-                else -> throw RuntimeException("wtf is $instruction")
-            }.also { println("$instruction $amount -> $it") }
-        }.also{ displayPart1(it.manhattanDisplacement()) }
 
-    readLinesFromFile("2020/day12.txt")
-        .map { it.toLetterAndNumber() }
-        .fold(WaypointBoat(0, 0, Waypoint(10, -1)))
-        { boat, (instruction, amount) ->
-            when (instruction) {
-                "N" -> boat.moveWaypoint(North, amount)
-                "S" -> boat.moveWaypoint(South, amount)
-                "E" -> boat.moveWaypoint(East, amount)
-                "W" -> boat.moveWaypoint(West, amount)
-                "L" -> boat.rotateWaypoint(Left, amount)
-                "R" -> boat.rotateWaypoint(Right, amount)
-                "F" -> boat.advance(amount)
-                else -> throw RuntimeException("wtf is $instruction")
-            }.also { println("$instruction $amount -> $it") }
-        }.also{ displayPart2(it.manhattanDisplacement()) }
+    val navigator = Navigator()
+
+    val simpleBoat = DirectionalBoat(origin, East)
+    val waypointBoat = WaypointBoat(origin, Waypoint(10, -1))
+
+    navigator.navigate(simpleBoat).also { displayPart1(it.currentLocation().manhattanDisplacement()) }
+    navigator.navigate(waypointBoat).also { displayPart2(it.currentLocation().manhattanDisplacement()) }
 }
 
-data class Waypoint(val x: Int, val y: Int) {
+class Navigator {
 
-    fun move(direction: Compass, length: Int) =
-        when (direction) {
-            North -> Waypoint(x, y - length)
-            South -> Waypoint(x, y + length)
-            East -> Waypoint(x + length, y)
-            West -> Waypoint(x - length, y)
+    private val instructions: List<Instruction> = readLinesFromFile("2020/day12.txt").map { it.toLetterAndNumber() }
+
+    fun <T: Boat> navigate(boat: T): T =
+        boat.also {
+            instructions.forEach { (letter, amount) ->
+                when (letter) {
+                    "N" -> boat.navigateByCompass(North, amount)
+                    "S" -> boat.navigateByCompass(South, amount)
+                    "E" -> boat.navigateByCompass(East, amount)
+                    "W" -> boat.navigateByCompass(West, amount)
+                    "L" -> boat.navigateByRotation(Rotate.Left, amount/90)
+                    "R" -> boat.navigateByRotation(Rotate.Right, amount/90)
+                    "F" -> boat.forwards(amount)
+                    else -> throw RuntimeException("wtf is $letter")
+                }
+            }
         }
 
-    fun rotate(hand: Hand) =
-        when (hand) {
-            Left -> Waypoint(y, -x)
-            Right -> Waypoint(-y, x)
-        }
 }
 
-data class WaypointBoat(val x: Int, val y: Int, val waypoint: Waypoint) {
+interface Boat {
+    fun navigateByCompass(compassDirection: Compass, amount: Int)
+    fun navigateByRotation(direction: Rotate, amount: Int)
+    fun forwards(amount: Int)
+    fun currentLocation(): Location2D
+}
 
-    fun moveWaypoint(direction: Compass, length: Int) = WaypointBoat(x, y, waypoint.move(direction, length))
+typealias Waypoint = Location2D
+class WaypointBoat(private var location: Location2D, private var waypoint: Waypoint): Boat {
 
-    fun rotateWaypoint(hand: Hand, degrees: Int) = WaypointBoat(x, y, (1..(degrees/90)).fold(waypoint) { it, _ -> it.rotate(hand)})
+    override fun navigateByCompass(compassDirection: Compass, amount: Int)  {
+        waypoint = waypoint.move(compassDirection, amount)
+    }
 
-    fun advance(times: Int) = (1..times).fold(this) { boat, _ -> boat.move()}
+    override fun navigateByRotation(direction: Rotate, amount: Int) {
+        waypoint = generateSequence(waypoint) { it.rotate(direction) }.elementAt(amount)
+    }
 
-    fun move() = WaypointBoat(x + waypoint.x, y + waypoint.y, waypoint)
+    override fun forwards(amount: Int) {
+        location = generateSequence(location) { it.move(waypoint.x, waypoint.y) }.elementAt(amount)
+    }
+
+    override fun currentLocation() = location
+
+}
+
+class DirectionalBoat(private var location: Location2D, private var facing : Compass): Boat {
+
+    override fun navigateByCompass(compassDirection: Compass, amount: Int) {
+        location = location.move(compassDirection, amount)
+    }
+
+    override fun navigateByRotation(direction: Rotate, amount: Int) {
+        facing = generateSequence(facing) { it.turn(direction) }.elementAt(amount)
+    }
+
+    override fun forwards(amount: Int) = navigateByCompass(facing, amount)
+
+    override fun currentLocation() = location
+
+}
+
+val origin = Location2D(0, 0)
+
+class Location2D(val x: Int, val y: Int) {
+    fun move(compassDirection: Compass, length: Int) =
+        when (compassDirection) {
+            North -> Location2D(x, y - length)
+            South -> Location2D(x, y + length)
+            East -> Location2D(x + length, y)
+            West -> Location2D(x - length, y)
+        }
+
+    fun move(dx: Int, dy: Int) = Location2D(x + dx, y + dy)
+
+    fun rotate(rotate: Rotate) =
+        when (rotate) {
+            Rotate.Left -> Location2D(y, -x)
+            Rotate.Right -> Location2D(-y, x)
+        }
 
     fun manhattanDisplacement() = x.absoluteValue + y.absoluteValue
-
 }
-
-data class Boat(val x: Int, val y: Int, val facing : Compass) {
-    fun move(direction: Compass, length: Int) =
-        when (direction) {
-            North -> Boat(x, y - length, facing)
-            South -> Boat(x, y + length, facing)
-            East -> Boat(x + length, y, facing)
-            West -> Boat(x - length, y, facing)
-        }
-
-    fun turn(hand: Hand, degrees: Int) = Boat(x, y, (1..(degrees/90)).fold(facing) { it, _ -> it.turn(hand)})
-
-    fun advance(length: Int) = move(facing, length)
-
-    fun manhattanDisplacement() = x.absoluteValue + y.absoluteValue
-
-}
-
 
 sealed class Compass {
-    abstract fun turn(hand: Hand): Compass
+    abstract fun turn(rotate: Rotate): Compass
 }
 object North : Compass() {
-    override fun turn(hand: Hand) =
-        when (hand) {
-            Left -> West
-            Right -> East
+    override fun turn(rotate: Rotate) =
+        when (rotate) {
+            Rotate.Left -> West
+            Rotate.Right -> East
         }
 
     override fun toString() = "North"
 }
 object South : Compass() {
-    override fun turn(hand: Hand) =
-        when (hand) {
-            Left -> East
-            Right -> West
+    override fun turn(rotate: Rotate) =
+        when (rotate) {
+            Rotate.Left -> East
+            Rotate.Right -> West
         }
 
     override fun toString() = "South"
 }
 object East : Compass() {
-    override fun turn(hand: Hand) =
-        when (hand) {
-            Left -> North
-            Right -> South
+    override fun turn(rotate: Rotate) =
+        when (rotate) {
+            Rotate.Left -> North
+            Rotate.Right -> South
         }
 
     override fun toString() = "East"
 }
 object West : Compass() {
-    override fun turn(hand: Hand) =
-        when (hand) {
-            Left -> South
-            Right -> North
+    override fun turn(rotate: Rotate) =
+        when (rotate) {
+            Rotate.Left -> South
+            Rotate.Right -> North
         }
 
     override fun toString() = "West"
 }
 
 
-sealed class Hand {}
-object Left: Hand() {}
-object Right: Hand() {}
+sealed class Rotate {
+    object Left: Rotate() {}
+    object Right: Rotate() {}
+}
+
+typealias Instruction = Pair<String, Int>
 
 val regex = Regex("(\\w)(\\d+)")
 fun String.toLetterAndNumber(): Pair<String, Int> {
-    val (char, distance) = regex.matchEntire(this)?.destructured?: throw RuntimeException(this)
-    return char to distance.toInt()
+    val (letter, distance) = regex.matchEntire(this)?.destructured?: throw RuntimeException(this)
+    return letter to distance.toInt()
 }
