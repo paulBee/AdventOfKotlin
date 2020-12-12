@@ -2,6 +2,7 @@ package utils.navigation
 
 import utils.algorithm.highestCommonFactor
 import java.lang.IllegalStateException
+import java.lang.StringBuilder
 import kotlin.math.abs
 
 data class Coordinate(val x : Int, val y : Int) {
@@ -50,3 +51,15 @@ data class DirectionRatio(val deltaX: Int, val deltaY: Int) {
 }
 
 enum class QUADRANT { UPPER_RIGHT, LOWER_RIGHT, LOWER_LEFT, UPPER_LEFT }
+
+fun Map<Coordinate, Any>.gridToString(): String {
+    val maxX: Int = this.keys.map { (x) -> x }.maxOrNull() ?: 0
+    val maxY: Int = this.keys.map { (_, y) -> y }.maxOrNull() ?: 0
+
+    val sb = StringBuilder()
+
+    (0..maxY).forEach { y -> sb.append((0..maxX).joinToString("") { x -> this[Coordinate(x, y)]?.toString() ?: "" }) }
+    sb.append("\n")
+
+    return sb.toString()
+}

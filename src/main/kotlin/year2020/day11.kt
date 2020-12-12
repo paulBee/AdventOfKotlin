@@ -7,6 +7,7 @@ import utils.collections.takeWhileInclusive
 import utils.collections.untilStable
 import utils.navigation.Coordinate
 import utils.navigation.diagonalDirections
+import utils.navigation.gridToString
 import utils.navigation.orthogonalDirections
 import java.lang.StringBuilder
 
@@ -47,17 +48,7 @@ class AirportLounge (private val floorplan: Map<Coordinate, LoungeSpace>, privat
         return other is AirportLounge && floorplan == other.floorplan
     }
 
-    override fun toString(): String {
-        val maxX: Int = floorplan.keys.map { (x) -> x }.maxOrNull() ?: 0
-        val maxY: Int = floorplan.keys.map { (_, y) -> y }.maxOrNull() ?: 0
-
-        val sb = StringBuilder()
-
-        (0..maxY).forEach { y -> sb.append((0..maxX).joinToString("") { x -> floorplan[Coordinate(x, y)]?.toString() ?: "" }) }
-        sb.append("\n")
-
-        return sb.toString()
-    }
+    override fun toString() = floorplan.gridToString()
 
     override fun hashCode(): Int {
         var result = floorplan.hashCode()
