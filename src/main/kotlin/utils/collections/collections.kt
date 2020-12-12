@@ -36,16 +36,16 @@ fun <T> Sequence<T>.chunkWhen(fn: (T, T) -> Boolean) : Sequence<List<T>> =
 fun <T> Sequence<T>.takeWhileInclusive(pred: (T) -> Boolean): Sequence<T> {
     var previousResult = true
     return takeWhile {
-        val shouldStop = previousResult
-        pred(it).also { thisResult -> previousResult = thisResult }
-        shouldStop
+        val shouldSContinue = previousResult
+        previousResult = pred(it)
+        shouldSContinue
     }
 }
 
 fun <T> Sequence<T>.untilStable(): T =
     this.zipWithNext()
         .takeWhileInclusive { (a, b) -> a != b }
-        .last().let { (it) -> it }
+        .last().let { (it, _) -> it }
 
 /**
  * produces the product of a list of numbers, converts them to Long to reduce overflow issues

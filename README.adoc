@@ -29,4 +29,6 @@ http://adventofcode.com/2020[Helping Elves] with https://kotlinlang.org/[Kotlin]
 |https://github.com/paulBee/AdventOfKotlin/blob/master/src/main/kotlin/year2020/day10.kt[Parts 1 & 2]
 |https://adventofcode.com/2020/day/11[Day 11: Seating System]
 |https://github.com/paulBee/AdventOfKotlin/blob/master/src/main/kotlin/year2020/day11.kt[Parts 1 & 2]
+|https://adventofcode.com/2020/day/12[Day 12: Rain Risk]
+|https://github.com/paulBee/AdventOfKotlin/blob/master/src/main/kotlin/year2020/day12.kt[Parts 1 & 2]
 |===
