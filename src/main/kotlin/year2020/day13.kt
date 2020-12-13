@@ -4,12 +4,13 @@ import utils.algorithm.lowestCommonMultiple
 import utils.aoc.displayPart1
 import utils.aoc.displayPart2
 import utils.aoc.readLinesFromFile
+import utils.collections.multiply
+import utils.collections.sumLongBy
 
 fun main () {
     val (timeInput, bussesInput) = readLinesFromFile("2020/day13.txt")
 
     val time = timeInput.toLong()
-
     val busses = bussesInput.toBusses()
 
     busses
@@ -27,13 +28,29 @@ fun main () {
         )
     }.also { displayPart2(it.time) }
 
+    displayPart2(chineseRemainderTheorem(busses))
 }
 
 data class PuzzleState(val time: Long, val synchronisedPeriod: Long)
 
-data class Bus(val busId: Long, val offset: Long) {
+data class Bus(val busId: Long, val offsetProvided: Long) {
+    val offset = offsetProvided % busId
     val period = busId
     fun test (time: Long) = (time + offset) % busId == 0L
+}
+
+fun chineseRemainderTheorem(busses: List<Bus>): Long {
+    val productOfPeriods = busses.map { it.period }.multiply()
+
+    return busses.sumLongBy { bus ->
+        val remainder = bus.period - bus.offset
+        val partialProduct = productOfPeriods/bus.period
+        val thatExtraBitIHaventGrokked =                        // lol. I get this is partialProduct.x ≡ 1 mod (bus.period)
+            generateSequence(0L) { it + partialProduct }    // I just havent understood WHY its that!
+                .indexOfFirst { it % bus.period == 1L }         // answers on a postcard please :)
+
+        remainder * partialProduct * thatExtraBitIHaventGrokked
+    }.let { it % productOfPeriods }
 }
 
 fun String.toBusses(): List<Bus> =
