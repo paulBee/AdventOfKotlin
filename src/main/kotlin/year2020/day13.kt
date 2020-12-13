@@ -1,5 +1,6 @@
 package year2020
 
+import utils.algorithm.lowestCommonMultiple
 import utils.aoc.displayPart1
 import utils.aoc.displayPart2
 import utils.aoc.readLinesFromFile
@@ -9,28 +10,38 @@ fun main () {
 
     val time = timeInput.toLong()
 
-    val bussesAndXs = bussesInput.split(",")
+    val busses = bussesInput.toBusses()
 
-    val busses = bussesAndXs
-        .filter { it != "x" }
-        .map { it.toLong() }
-
-    busses.map { it to it - (time % it) }.minByOrNull { it.second }
+    busses
+        .map { it.busId }
+        .map { busId -> busId to busId - (time % busId) }
+        .minByOrNull { it.second }
         ?.also { displayPart1(it.first * it.second) }
 
-    val bussesAndOffset = busses.map { it to bussesAndXs.indexOf(it.toString()) }
 
-    var checkingIncrement = 1L
-    var currentGuess = 1L
-
-
-    bussesAndOffset.forEach { (bus, offset) ->
-        while ((currentGuess + offset) % bus != 0L) {
-            currentGuess += checkingIncrement
-        }
-        checkingIncrement *= bus // this ensures that the next guess will work for all previously considered busses
-    }
-
-    displayPart2(currentGuess)
+    busses.fold(PuzzleState(1L, 1L))
+    { (time, synchronisedPeriod), bus ->
+        PuzzleState(
+            generateSequence(time) { it + synchronisedPeriod }.first { bus.test(it) },
+            lowestCommonMultiple(synchronisedPeriod, bus.period)
+        )
+    }.also { displayPart2(it.time) }
 
 }
+
+data class PuzzleState(val time: Long, val synchronisedPeriod: Long)
+
+data class Bus(val busId: Long, val offset: Long) {
+    val period = busId
+    fun test (time: Long) = (time + offset) % busId == 0L
+}
+
+fun String.toBusses(): List<Bus> =
+    this.split(",")
+        .foldIndexed(emptyList())
+        { offset, busses, input ->
+            when (input) {
+                "x" -> busses
+                else -> busses.plus(Bus(input.toLong(), offset.toLong()))
+            }
+        }
