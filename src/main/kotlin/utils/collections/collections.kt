@@ -55,6 +55,7 @@ fun List<Number>.multiply() =
         .reduce { acc, i -> acc * i  }
 
 
+fun Collection<Long>.sumLong(): Long = this.sumLongBy { it }
 fun <T> Collection<T>.sumLongBy(fn: (T) -> Long): Long = this.map{ fn(it) }.fold(0L) { acc, next -> acc + next }
 
 /**

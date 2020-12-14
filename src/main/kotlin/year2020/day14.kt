@@ -3,88 +3,79 @@ package year2020
 import utils.aoc.displayPart1
 import utils.aoc.displayPart2
 import utils.aoc.readLinesFromFile
-import utils.collections.sumLongBy
+import utils.collections.sumLong
 
 fun main() {
-    part1()
+    val instructions = readLinesFromFile("2020/day14.txt").map { it.toMaskMemoryInstruction() }
 
-    val memory = mutableMapOf<BooleanNumber, Int>()
-    var mask = BitMask()
-    readLinesFromFile("2020/day14.txt").forEach { line ->
-        when {
-            line.startsWith("mask") -> mask = line.toMask()
-            line.startsWith("mem") -> line.toLocationAndValue().also {
-                    (location, number) -> mask.applyFloating(location.toBinaryNumber()).forEach { memory[it] = number.toInt() }
+    memoryFrom(::OverwriteMask, instructions).values.sumLong().also(displayPart1)
+    memoryFrom(::FloatingMask, instructions).values.sumLong().also(displayPart2)
+}
+
+fun <T: MemoryMask> memoryFrom(maskConstructor: (String) -> T, instructions: List<MaskMemoryInstruction>): Map<Long, Long> {
+    val memory = mutableMapOf<Long, Long>()
+    var mask = maskConstructor("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+
+    instructions.forEach { instruction ->
+            when (instruction) {
+                is NewMask -> mask = maskConstructor(instruction.mask)
+                is UpdateMemory ->  mask.locationsOf(instruction.address).forEach { memory[it] = mask.valueOf(instruction.value) }
             }
         }
-    }
 
-    memory.values.sumLongBy { it.toLong() }.also(displayPart2)
+    return memory
+}
+
+interface MemoryMask {
+    fun locationsOf(location: Long) = listOf(location)
+    fun valueOf(value: Long) = value
+}
+
+class OverwriteMask(val mask: String) : MemoryMask {
+
+    override fun valueOf(value: Long) =
+        mask.zip(value.to36BitString())
+        .map {(mask, number) ->
+            when (mask) {
+                '1' -> '1'
+                '0' -> '0'
+                'X' -> number
+                else -> throw RuntimeException("Thats a bad mask $mask")
+            }
+        }.joinToString("").toLong(2)
 
 }
 
-private fun part1() {
-    val memory = mutableMapOf<Int, BooleanNumber>()
-    var mask = BitMask()
-    readLinesFromFile("2020/day14.txt").forEach { line ->
-        when {
-            line.startsWith("mask") -> mask = line.toMask()
-            line.startsWith("mem") ->  line.toLocationAndValue().also {
-                (location, number) -> memory[location.toInt()] = mask.applyOverwrite(number.toBinaryNumber())
-            }
-        }
-    }
-    memory.values.sumLongBy { it.toLong() }.also(displayPart1)
-}
+class FloatingMask(val mask: String): MemoryMask {
 
-typealias BooleanNumber = List<Boolean>
-
-private fun BooleanNumber.toLong() =
-    this.map {
-        when (it) {
-            true -> '1'
-            false -> '0'
-        }
-    }.joinToString("").toLong(2)
-
-fun String.toMask() = BitMask(this.split(" = ")[1])
-
-fun String.toLocationAndValue() = Regex("""mem\[(\d+)\] = (\d+)""")
-    .matchEntire(this)
-    ?.destructured!!
-    .let { (location, value) -> location to value}
-
-fun String.toBinaryNumber() = this.toInt()
-    .toString(2)
-    .padStart(36, '0')
-    .map { when(it) {
-        '1' -> true
-        '0' -> false
-        else -> throw RuntimeException("$it is not a binary digit")
-    } }
-
-
-class BitMask(inputString: String = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX") {
-    val mask: List<Boolean?> = inputString.map {
-        when (it) {
-            'X' -> null
-            '1' -> true
-            '0' -> false
-            else -> throw RuntimeException("$it is an invalid bitmask character")
-        }
-    }
-
-    fun applyOverwrite(binaryNumber: BooleanNumber): BooleanNumber =
-        mask.zip(binaryNumber)
-            .map {(mask, number) -> mask ?: number }
-
-    fun applyFloating(binaryNumber: BooleanNumber): List<BooleanNumber> =
-        mask.zip(binaryNumber).fold(listOf(listOf()))
+    override fun locationsOf(location: Long) =
+        mask.zip(location.to36BitString()).fold(listOf(""))
         { acc, (maskEntry, numberEntry) ->
             when (maskEntry) {
-                true -> acc.map { it.plus(true) }
-                false -> acc.map { it.plus(numberEntry) }
-                else -> acc.flatMap { listOf(it.plus(true), it.plus(false)) }
+                '1' -> acc.map { it.plus("1") }
+                '0' -> acc.map { it.plus(numberEntry) }
+                'X' -> acc.flatMap { listOf(it.plus("1"), it.plus("0")) }
+                else -> throw RuntimeException("Thats a bad mask $mask")
             }
-        }
+        }.map { it.toLong(2) }
 }
+
+fun Long.to36BitString() = this.toString(2).padStart(36, '0')
+
+sealed class MaskMemoryInstruction {}
+data class NewMask(val mask: String): MaskMemoryInstruction() {}
+data class UpdateMemory(val address: Long, val value: Long): MaskMemoryInstruction() {}
+
+fun String.toMaskMemoryInstruction(): MaskMemoryInstruction =
+    when {
+        this.startsWith("mask") -> this.toNewMask()
+        this.startsWith("mem") ->  this.toUpdate()
+        else -> throw RuntimeException("$this not a valid input")
+    }
+
+fun String.toNewMask() = NewMask(this.split(" = ")[1])
+
+fun String.toUpdate() = Regex("""mem\[(\d+)\] = (\d+)""")
+    .matchEntire(this)
+    ?.destructured!!
+    .let { (location, value) -> UpdateMemory(location.toLong(), value.toLong())}
