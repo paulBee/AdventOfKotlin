@@ -14,10 +14,9 @@ fun main () {
     val busses = bussesInput.toBusses()
 
     busses
-        .map { it.busId }
-        .map { busId -> busId to busId - (time % busId) }
+        .map { bus -> bus to bus.period - (time % bus.period) }
         .minByOrNull { it.second }
-        ?.also { displayPart1(it.first * it.second) }
+        ?.also { displayPart1(it.first.busId * it.second) }
 
 
     busses.fold(PuzzleState(1L, 1L))
@@ -33,17 +32,17 @@ fun main () {
 
 data class PuzzleState(val time: Long, val synchronisedPeriod: Long)
 
-data class Bus(val busId: Long, val offsetProvided: Long) {
-    val offset = offsetProvided % busId
+data class Bus(val busId: Long, val offset: Long) {
     val period = busId
-    fun test (time: Long) = (time + offset) % busId == 0L
+    val remainder = if (offset == 0L) 0L else period - (period % busId)
+    fun test (time: Long) = time  % busId == remainder
 }
 
 fun chineseRemainderTheorem(busses: List<Bus>): Long {
     val productOfPeriods = busses.map { it.period }.multiply()
 
     return busses.sumLongBy { bus ->
-        val remainder = bus.period - bus.offset
+        val remainder = bus.remainder
         val partialProduct = productOfPeriods/bus.period
         val thatExtraBitIHaventGrokked =                        // lol. I get this is partialProduct.x ≡ 1 mod (bus.period)
             generateSequence(0L) { it + partialProduct }    // I just havent understood WHY its that!
