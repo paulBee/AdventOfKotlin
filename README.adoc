@@ -33,4 +33,8 @@ http://adventofcode.com/2020[Helping Elves] with https://kotlinlang.org/[Kotlin]
 |https://github.com/paulBee/AdventOfKotlin/blob/master/src/main/kotlin/year2020/day12.kt[Parts 1 & 2]
 |https://adventofcode.com/2020/day/13[Day 13: Shuttle Search]
 |https://github.com/paulBee/AdventOfKotlin/blob/master/src/main/kotlin/year2020/day13.kt[Parts 1 & 2]
+|https://adventofcode.com/2020/day/14[Day 14: Docking Data]
+|https://github.com/paulBee/AdventOfKotlin/blob/master/src/main/kotlin/year2020/day14.kt[Parts 1 & 2]
+|https://adventofcode.com/2020/day/15[Day 15: Rambunctious Recitation]
+|https://github.com/paulBee/AdventOfKotlin/blob/master/src/main/kotlin/year2020/day15.kt[Parts 1 & 2]
 |===
