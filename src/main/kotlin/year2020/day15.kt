@@ -18,10 +18,9 @@ fun sequenceFrom(startingList: List<Long>): Sequence<Long> {
 
     return generateSequence()
     {
-        if (iteration in startingList.indices) {
-            startingList[iteration.toInt()]
-        } else {
-            history[lastNumber]?.let { iteration - it } ?: 0L
+        when (iteration) {
+            in startingList.indices -> startingList[iteration.toInt()]
+            else -> history[lastNumber]?.let { iteration - it } ?: 0L
         }.also {
             history[lastNumber] = iteration
             lastNumber = it
