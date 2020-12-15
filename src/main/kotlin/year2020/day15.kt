@@ -5,26 +5,28 @@ import utils.aoc.displayPart2
 import utils.aoc.readTextFromFile
 
 fun main() {
-    val starter = readTextFromFile("2020/day15.txt").split(",").map { it.toLong() }
+    val starter = readTextFromFile("2020/day15.txt").split(",").map { it.toInt() }
 
     sequenceFrom(starter).take(2020).last().also(displayPart1)
     sequenceFrom(starter).take(30_000_000).last().also(displayPart2)
 }
 
-fun sequenceFrom(startingList: List<Long>): Sequence<Long> {
-    val history = mutableMapOf<Long, Long>()
-    var iteration = 0L
-    var lastNumber = startingList[0]
+fun sequenceFrom(seedList: List<Int>) = sequence {
 
-    return generateSequence()
-    {
-        when (iteration) {
-            in startingList.indices -> startingList[iteration.toInt()]
-            else -> history[lastNumber]?.let { iteration - it } ?: 0L
-        }.also {
-            history[lastNumber] = iteration
-            lastNumber = it
-            iteration++
-        }
+    val lastSeenOn = seedList
+        .mapIndexed { index, value -> value to index }
+        .toMap().toMutableMap()
+
+    seedList.forEach { yield(it) }
+
+    var iteration = seedList.indices.last
+    var lastNumber = seedList.last()
+
+    while (true) {
+        val nextNumber = lastSeenOn[lastNumber]?.let { iteration - it } ?: 0
+        lastSeenOn[lastNumber] = iteration
+        yield(nextNumber)
+        lastNumber = nextNumber
+        iteration++
     }
 }
