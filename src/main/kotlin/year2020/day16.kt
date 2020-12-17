@@ -20,11 +20,10 @@ fun main() {
     val validTickets = nearbyTickets.filter { it.values.none { number -> fields.none { field -> number validFor field } } }
 
     val fieldToPossibleIndices = fields.map { it to it.indiciesAllPass(validTickets) }
-    val puzzleIndices = fieldToIndex(fieldToPossibleIndices)
+    fieldToIndex(fieldToPossibleIndices)
         .filter { it.first.name.startsWith("departure") }
         .map { it.second }
-
-    puzzleIndices.map { myTicket.values[it] }
+        .map { myTicket.values[it] }
         .multiply().also(displayPart2)
 
 }
