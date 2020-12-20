@@ -25,8 +25,8 @@ fun main() {
 
 fun countSeaMonsters(image: List<String>, rotations: Int):Int {
     val rowLength = image.first().length
-    val seaMonsters = (0 until image.size - 2).sumBy { y ->
-        (0 until rowLength - 19).count { x -> isMonsterAt(x, y, image) }
+    val seaMonsters = (0..image.size - monsterHeight).sumBy { y ->
+        (0..rowLength - monsterWidth).count { x -> isMonsterAt(x, y, image) }
     }
     return when {
         seaMonsters > 0 -> seaMonsters
@@ -36,6 +36,22 @@ fun countSeaMonsters(image: List<String>, rotations: Int):Int {
     }
 }
 
+val monsterImage = listOf(
+    "                  # ",
+    "#    ##    ##    ###",
+    " #  #  #  #  #  #   "
+)
+
+val monsterHeight = monsterImage.size
+val monsterWidth = monsterImage[0].length
+
+fun isMonsterAt(x: Int, y: Int, image: List<String>) =
+    monsterImage.indices.all { rowIndex ->
+        monsterImage[rowIndex].indices.all { colIndex ->
+            monsterImage[rowIndex][colIndex] != '#' || image[y+rowIndex][x+colIndex] == '#'
+        }
+    }
+
 typealias Jigsaw = List<List<Piece>>
 
 fun Jigsaw.toImage() = this.flatMap { row ->
@@ -43,23 +59,6 @@ fun Jigsaw.toImage() = this.flatMap { row ->
         .map { it.contents }
         .reduce { acc, next -> acc.mapIndexed { index, string -> string + next[index] } }
 }
-
-fun isMonsterAt(x: Int, y: Int, image: List<String>) =
-    image[y+1][x] == '#' &&
-    image[y+2][x+1] == '#' &&
-    image[y+2][x+4] == '#' &&
-    image[y+1][x+5] == '#' &&
-    image[y+1][x+6] == '#' &&
-    image[y+2][x+7] == '#' &&
-    image[y+2][x+10] == '#' &&
-    image[y+1][x+11] == '#' &&
-    image[y+1][x+12] == '#' &&
-    image[y+2][x+13] == '#' &&
-    image[y+2][x+16] == '#' &&
-    image[y+1][x+17] == '#' &&
-    image[y][x+18] == '#' &&
-    image[y+1][x+18] == '#' &&
-    image[y+1][x+19] == '#'
 
 fun orientPieces(leftPiece: Piece?, rowAbove: List<Piece?>): List<List<Piece>> =
     if (leftPiece == null) {
