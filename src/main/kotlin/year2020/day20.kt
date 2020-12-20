@@ -11,19 +11,14 @@ fun main() {
 
     pieces.forEach { it.identifyConnections(pieces) }
 
-    val rowSize =  sqrt(pieces.size.toDouble()).toInt()
+    val jigsaw = orientPieces(pieces.first { it.isCorner() }, blankRow(pieces))
 
-    val aboveRow = (1..rowSize).map { null }
+    val image = jigsaw.toImage()
 
-    val jigsaw = orientPieces(pieces.first { it.isCorner() }, aboveRow)
+    val monsters = countSeaMonsters(image, 4)
+    val choppyWater = image.sumBy { it.count { it == '#' } }
 
-    val image = jigsaw.flatMap { row ->
-        row.map { it.contents }.reduce { acc, next -> acc.mapIndexed { index, string -> string + next[index] } }
-    }
-
-
-    val numberOrMonsters = countSeaMonsters(image, 4)
-    displayPart2(image.sumBy { it.count { it == '#' } } - numberOrMonsters*15)
+    displayPart2(choppyWater - monsters * 15)
 
     pieces.filter { it.isCorner() }.map { it.id }.multiply().also(displayPart1)
 }
@@ -37,7 +32,16 @@ fun countSeaMonsters(image: List<String>, rotations: Int):Int {
         seaMonsters > 0 -> seaMonsters
         rotations > 0 -> countSeaMonsters(image.rotate(), rotations - 1)
         else -> countSeaMonsters(image.reversed(), 4)
+//        what if there are no monsters? There is always monsters!
     }
+}
+
+typealias Jigsaw = List<List<Piece>>
+
+fun Jigsaw.toImage() = this.flatMap { row ->
+    row
+        .map { it.contents }
+        .reduce { acc, next -> acc.mapIndexed { index, string -> string + next[index] } }
 }
 
 fun isMonsterAt(x: Int, y: Int, image: List<String>) =
@@ -59,18 +63,20 @@ fun isMonsterAt(x: Int, y: Int, image: List<String>) =
 
 fun orientPieces(leftPiece: Piece?, rowAbove: List<Piece?>): List<List<Piece>> =
     if (leftPiece == null) {
-        emptyList()
+        emptyList() // at bottom of jigsaw
     } else {
-        val oreintedRow = leftPiece.orient(null, rowAbove)
-        listOf(oreintedRow) + orientPieces(leftPiece.downSide.connectsTo, oreintedRow)
+        val orientedRow = leftPiece.buildRow(null, rowAbove)
+        listOf(orientedRow) + orientPieces(leftPiece.downSide.connectsTo, orientedRow)
     }
 
+fun blankRow(pieces: List<Piece>): List<Piece?> {
+    val rowSize =  sqrt(pieces.size.toDouble()).toInt()
+    return (1..rowSize).map { null }
+}
 
 class Piece(val input: List<String>) {
 
-    val id: Long by lazy {
-        input.first().split(" ")[1].split(":")[0].toLong()
-    }
+    val id = input.first().split(" ")[1].split(":")[0].toLong()
 
     val square = input.drop(1).take(10)
 
@@ -78,9 +84,7 @@ class Piece(val input: List<String>) {
     var downSide = Side(square.last())
     var leftSide = Side(square.map { it.first() }.joinToString(""))
     var rightSide = Side(square.map { it.last() }.joinToString(""))
-
     var contents = square.drop(1).dropLast(1).map { it.drop(1).dropLast(1) }
-
     val sides = listOf(upSide, downSide, leftSide, rightSide)
 
     fun isCorner() = sides.count { it.isEdge() } == 2
@@ -88,19 +92,22 @@ class Piece(val input: List<String>) {
     fun identifyConnections(pieces: List<Piece>) {
         sides.forEach { it.findConnection(pieces.filter { it.id != id }) }
     }
-    fun orient(onLeft: Piece?, topRow: List<Piece?>): List<Piece> {
-        while(leftSide.connectsTo != onLeft) {
+
+    fun buildRow(onLeft: Piece?, topRow: List<Piece?>): List<Piece> {
+        orientPiece(onLeft, topRow.first())
+
+        val restOfRow: List<Piece> = rightSide.connectsTo?.buildRow(this, topRow.drop(1)) ?: emptyList()
+        return listOf(this) + restOfRow
+    }
+
+    private fun orientPiece(onLeft: Piece?, onTop: Piece?) {
+        while (leftSide.connectsTo != onLeft) {
             rotatePiece()
         }
 
-        if (upSide.connectsTo != topRow.first()) {
+        if (upSide.connectsTo != onTop) {
             flipVertical()
         }
-
-        assert(upSide.connectsTo == topRow.first(), { "TABLE FLIP!!" })
-
-        val restOfRow: List<Piece> = rightSide.connectsTo?.orient(this, topRow.drop(1)) ?: emptyList()
-        return listOf(this) + restOfRow
     }
 
     private fun flipVertical() {
@@ -118,16 +125,14 @@ class Piece(val input: List<String>) {
         downSide = leftSide
         leftSide = tmp
 
+        // I know there are better ways to track this, but this is more fun :)
         contents = contents.rotate()
     }
 
 }
 
-fun List<String>.rotate() = (0 until this.size).map { y: Int ->
-    (0 until this.size).map { x: Int ->
-        this[x][y]
-    }.joinToString("")
-}.reversed()
+fun List<String>.rotate() =
+    this.indices.map { y: Int -> this.indices.map { x: Int -> this[x][y] }.joinToString("") }.reversed()
 
 class Side(val shape: String) {
     var connectsTo: Piece? = null
