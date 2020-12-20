@@ -45,4 +45,6 @@ http://adventofcode.com/2020[Helping Elves] with https://kotlinlang.org/[Kotlin]
 |https://github.com/paulBee/AdventOfKotlin/blob/master/src/main/kotlin/year2020/day18.kt[Parts 1 & 2]
 |https://adventofcode.com/2020/day/19[Day 19: Monster Messages]
 |https://github.com/paulBee/AdventOfKotlin/blob/master/src/main/kotlin/year2020/day19.kt[Parts 1 & 2]
+|https://adventofcode.com/2020/day/20[Day 20: Jurassic Jigsaw]
+|https://github.com/paulBee/AdventOfKotlin/blob/master/src/main/kotlin/year2020/day20.kt[Parts 1 & 2]
 |===
