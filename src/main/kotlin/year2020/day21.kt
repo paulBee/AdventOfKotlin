@@ -6,52 +6,55 @@ import utils.aoc.readLinesFromFile
 
 fun main() {
     val products = readLinesFromFile("2020/day21.txt").map { it.toProduct() }
-    val ingredients = products.flatMap { it.ingredients }.toSet()
-    val allergens = products.flatMap { it.allergens }.toSet()
+    val ingredients = products.flatMap { it.ingredients() }.toSet()
+    val allergens = products.flatMap { it.allergens() }.toSet()
 
     val allergenToPossibleIngredients = allergens
-        .map { allergen -> allergen to products
-            .filter { it.allergens.contains(allergen) }
-            .map { it.ingredients }
-            .reduce { a, b -> a intersect b }
-    }.toMap()
-    
-    val ingredientsThatCouldBeAllergens = allergenToPossibleIngredients.values.reduce { acc, next -> acc union next }
-    val ingredientsThatArentAllergens = ingredients - ingredientsThatCouldBeAllergens
-
-    products.sumBy { product -> product.ingredients.count { ingredientsThatArentAllergens.contains(it) } }.also(displayPart1)
-
-    val allergenToPossibleActiveIngredients = allergenToPossibleIngredients.mapValues { it.value - ingredientsThatArentAllergens }
-
-    val allergenToIngredient = identifyAllergens(allergenToPossibleActiveIngredients.entries.map { it.key to it.value })
-
-    allergenToIngredient.sortedBy { it.first }.joinToString(",") { it.second }.also(displayPart2)
-
-}
-
-fun identifyAllergens(allergenToPossibleActiveIngredients: List<Pair<String, Set<String>>>): List<Pair<String, String>> {
-
-    if (allergenToPossibleActiveIngredients.size == 0) {
-        return emptyList()
+        .map { allergen ->
+            allergen to
+            products
+                .filter { it.allergens().contains(allergen) }
+                .map { it.ingredients() }
+                .reduce { a, b -> a intersect b }
     }
 
-    val (identified, unidentified) = allergenToPossibleActiveIngredients.partition { it.second.size == 1 }
+    val ingredientsThatArentAllergens = ingredients - allergenToPossibleIngredients.allIngredients()
 
-    val identifiedIngredients = identified.flatMap { it.second }.toSet()
+    products
+        .sumBy { product -> product.ingredients().count { ingredientsThatArentAllergens.contains(it) } }
+        .also(displayPart1)
 
-    return identified.map { (key, values) -> key to values.first() } + identifyAllergens(unidentified.map { it.first to it.second - identifiedIngredients })
+    identifyAllergens(allergenToPossibleIngredients.map { it.allergen() to it.possibleIngredients() - ingredientsThatArentAllergens })
+        .sortedBy { it.first }
+        .joinToString(",") { it.second }
+        .also(displayPart2)
 
 }
 
-data class Product(val ingredients: Set<String>, val allergens: Set<String>) {
-
-    fun removeIngredients(ingredientsThatArentAllergens: Set<String>): Pair<Set<String>, Set<String>> {
-        return allergens to ingredients - ingredientsThatArentAllergens
+fun identifyAllergens(unidentifiedAllergens: List<AllergenPossibilities>): List<Pair<String, String>> =
+    when (unidentifiedAllergens.size) {
+        0 -> emptyList()
+        else -> unidentifiedAllergens.partition { it.possibleIngredients().size == 1 }
+            .let { (onePossible, manyPossible) ->
+                onePossible.map { it.allergen() to it.possibleIngredients().first() } +
+                identifyAllergens(manyPossible.map { it.allergen() to it.possibleIngredients() - onePossible.allIngredients() })
+            }
     }
-}
 
-private fun String.toProduct(): Product {
-    val (ingredients, allergens) = this.split(" (contains ")
+typealias IngredientToAllergen = Pair<Set<String>, Set<String>>
+fun IngredientToAllergen.ingredients() = this.first
+fun IngredientToAllergen.allergens() = this.second
 
-    return Product(ingredients.split(" ").toSet(), allergens.split(")")[0].split(", ").toSet())
-}
+typealias AllergenPossibilities = Pair<String, Set<String>>
+fun AllergenPossibilities.allergen() = this.first
+fun AllergenPossibilities.possibleIngredients() = this.second
+fun List<AllergenPossibilities>.allIngredients() = this.map { it.possibleIngredients() }.reduce { acc, next -> acc union next }
+
+private fun String.toProduct(): Pair<Set<String>, Set<String>> =
+    this.split(" (contains ").let { (ingredients, allergens) ->
+        Pair(
+            ingredients.split(" ").toSet(),
+            allergens.split(")")[0].split(", ").toSet()
+        )
+    }
+
