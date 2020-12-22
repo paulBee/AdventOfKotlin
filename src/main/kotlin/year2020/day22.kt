@@ -4,7 +4,6 @@ import kotlinx.collections.immutable.*
 import utils.aoc.displayPart1
 import utils.aoc.readLinesFromFile
 import utils.collections.dropP
-import utils.collections.headAndTail
 import utils.collections.takeP
 import utils.strings.isNumber
 import utils.types.Either
@@ -24,54 +23,40 @@ fun main() {
         .also { winner -> winner.right?.also { println("Crab wins! with score: ${it.calculateScore()}") } }
 }
 
-private fun List<Int>.calculateScore(): Int =
-    this.reversed().foldIndexed(0) { index, acc, next -> acc + ((index + 1) * next) }
-
-private fun playCombat(deck1: PersistentList<Int>, deck2: PersistentList<Int>): PersistentList<Int> =
+private fun playCombat(deck1: Deck, deck2: Deck): Deck =
     when {
         deck1.isEmpty() -> deck2
         deck2.isEmpty() -> deck1
-        else -> when {
-            deck1.first() > deck2.first() -> playCombat(
-                deck1.dropP(1) + listOf(deck1.first(), deck2.first()),
-                deck2.dropP(1)
-            )
-            else -> playCombat(
-                deck1.dropP(1),
-                deck2.dropP(1) + listOf(deck2.first(), deck1.first())
-            )
-        }
+        deck1.first() > deck2.first() -> playCombat(deck1.winCard(deck2.first()), deck2.lost())
+        else -> playCombat(deck1.lost(), deck2.winCard(deck1.first()))
     }
 
-tailrec fun playRecursiveCombat(deck1: PersistentList<Int>, deck2: PersistentList<Int>, history: PersistentSet<Pair<List<Int>, List<Int>>> = persistentSetOf()): Either<List<Int>, List<Int>> {
-    return when {
+tailrec fun playRecursiveCombat(deck1: Deck, deck2: Deck, history: PersistentSet<Pair<Deck, Deck>> = persistentSetOf()): Either<Deck, Deck> =
+    when {
         deck1.isEmpty() -> Right(deck2)
         deck2.isEmpty() -> Left(deck1)
         history.contains(deck1 to deck2) -> Left(deck1)
         else -> when (determineRound(deck1, deck2)) {
-            is Player1 -> playRecursiveCombat(
-                deck1.dropP(1) + listOf(deck1.first(), deck2.first()),
-                deck2.dropP(1),
-                history + (deck1 to deck2))
-            is Player2 -> playRecursiveCombat(
-                deck1.dropP(1),
-                deck2.dropP(1) + listOf(deck2.first(), deck1.first()),
-                history + (deck1 to deck2)
-            )
+            is Player1 -> playRecursiveCombat(deck1.winCard(deck2.first()), deck2.lost(), history + (deck1 to deck2))
+            is Player2 -> playRecursiveCombat(deck1.lost(), deck2.winCard(deck1.first()), history + (deck1 to deck2))
         }
     }
-}
 
-fun determineRound(deck1: PersistentList<Int>, deck2: PersistentList<Int>): RoundWinner {
-    val (card1, rest1) = deck1.headAndTail()
-    val (card2, rest2) = deck2.headAndTail()
-    return when {
-        card1 <= rest1.size && card2 <= rest2.size -> playRecursiveCombat(rest1.takeP(card1), rest2.takeP(card2))
-            .let { if (it is Left) Player1 else Player2}
-        card1 > card2 -> Player1
+fun determineRound(deck1: Deck, deck2: Deck): RoundWinner =
+    when {
+        deck1.canRecurse() && deck2.canRecurse() -> playRecursiveCombat(deck1.recurse(), deck2.recurse()).toPlayer()
+        deck1.first() > deck2.first() -> Player1
         else -> Player2
     }
-}
+
+typealias Deck = PersistentList<Int>
+fun Deck.winCard(card: Int) = this.dropP(1) + listOf(this.first(), card)
+fun Deck.lost() = this.dropP(1)
+fun Deck.canRecurse() = this.first() < this.size
+fun Deck.recurse() = this.first().let { this.dropP(1).takeP(it)}
+fun Deck.calculateScore(): Int = this.reversed().foldIndexed(0) { index, acc, next -> acc + ((index + 1) * next) }
+
+fun Either<Deck, Deck>.toPlayer() = this.let { if (it is Left) Player1 else Player2}
 
 sealed class RoundWinner
 object Player1: RoundWinner()
