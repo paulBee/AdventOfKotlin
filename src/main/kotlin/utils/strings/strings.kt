@@ -37,3 +37,5 @@ fun String.toLetterAndNumber(): Pair<String, Int> {
     val (letter, distance) = regex.matchEntire(this)?.destructured?: throw RuntimeException(this)
     return letter to distance.toInt()
 }
+
+fun String.isNumber() = this.all { it.isDigit() }
