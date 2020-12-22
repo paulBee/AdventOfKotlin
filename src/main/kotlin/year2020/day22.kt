@@ -36,13 +36,13 @@ tailrec fun playRecursiveCombat(deck1: Deck, deck2: Deck, history: PersistentSet
         deck1.isEmpty() -> Right(deck2)
         deck2.isEmpty() -> Left(deck1)
         history.contains(deck1 to deck2) -> Left(deck1)
-        else -> when (determineRound(deck1, deck2)) {
+        else -> when (roundWinner(deck1, deck2)) {
             is Player1 -> playRecursiveCombat(deck1.winCard(deck2.first()), deck2.lost(), history + (deck1 to deck2))
             is Player2 -> playRecursiveCombat(deck1.lost(), deck2.winCard(deck1.first()), history + (deck1 to deck2))
         }
     }
 
-fun determineRound(deck1: Deck, deck2: Deck): RoundWinner =
+fun roundWinner(deck1: Deck, deck2: Deck): RoundWinner =
     when {
         deck1.canRecurse() && deck2.canRecurse() -> playRecursiveCombat(deck1.recurse(), deck2.recurse()).toPlayer()
         deck1.first() > deck2.first() -> Player1
