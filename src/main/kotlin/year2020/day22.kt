@@ -56,7 +56,7 @@ fun Deck.canRecurse() = this.first() < this.size
 fun Deck.recurse() = this.first().let { this.dropP(1).takeP(it)}
 fun Deck.calculateScore(): Int = this.reversed().foldIndexed(0) { index, acc, next -> acc + ((index + 1) * next) }
 
-fun Either<Deck, Deck>.toPlayer() = this.let { if (it is Left) Player1 else Player2}
+fun Either<Deck, Deck>.toPlayer() = if (this is Left) Player1 else Player2
 
 sealed class RoundWinner
 object Player1: RoundWinner()
