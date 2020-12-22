@@ -1,5 +1,8 @@
 package utils.collections
 
+import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.toPersistentList
+
 //List fun
 /**
  * combines 2 iterables into an iterable of Pairs with every combination of the two arguments
@@ -88,3 +91,6 @@ fun <K,V> Map<K,V>.keysWhereValue(predicate: (V) -> Boolean) =
         .map { (key) -> key }
 
 fun <K,V> Map<K, List<V>>.occurrencesOf(number: K) = this[number]?.size ?: 0
+
+fun <T> PersistentList<T>.dropP(amount: Int): PersistentList<T> = this.drop(amount).toPersistentList()
+fun <T> List<T>.takeP(amount: Int) = this.take(amount).toPersistentList()

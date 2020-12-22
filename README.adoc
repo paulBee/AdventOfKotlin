@@ -49,4 +49,6 @@ http://adventofcode.com/2020[Helping Elves] with https://kotlinlang.org/[Kotlin]
 |https://github.com/paulBee/AdventOfKotlin/blob/master/src/main/kotlin/year2020/day20.kt[Parts 1 & 2]
 |https://adventofcode.com/2020/day/21[Day 21: Allergen Assessment]
 |https://github.com/paulBee/AdventOfKotlin/blob/master/src/main/kotlin/year2020/day21.kt[Parts 1 & 2]
+|https://adventofcode.com/2020/day/22[Day 22: Crab Combat]
+|https://github.com/paulBee/AdventOfKotlin/blob/master/src/main/kotlin/year2020/day22.kt[Parts 1 & 2]
 |===
