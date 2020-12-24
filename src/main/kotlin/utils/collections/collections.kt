@@ -2,6 +2,7 @@ package utils.collections
 
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.toPersistentList
+import utils.hof.firstArg
 
 //List fun
 /**
@@ -21,7 +22,6 @@ fun <T> List<T>.chunkWhen(newChunkWhenTrue: (T, T) -> Boolean): List<List<T>> =
 fun List<String>.chunkOnEmptyLine() =
     this.chunkWhen { _, element -> element.isBlank() }
         .map { chunk -> chunk.filter { it.isNotBlank() } }
-
 
 fun <T> Sequence<T>.chunkWhen(fn: (T, T) -> Boolean) : Sequence<List<T>> =
     sequence {
