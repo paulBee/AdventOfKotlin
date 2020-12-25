@@ -55,4 +55,6 @@ http://adventofcode.com/2020[Helping Elves] with https://kotlinlang.org/[Kotlin]
 |https://github.com/paulBee/AdventOfKotlin/blob/master/src/main/kotlin/year2020/day23.kt[Parts 1 & 2]
 |https://adventofcode.com/2020/day/24[Day 24: Lobby Layout]
 |https://github.com/paulBee/AdventOfKotlin/blob/master/src/main/kotlin/year2020/day24.kt[Parts 1 & 2]
+|https://adventofcode.com/2020/day/25[Day 25: Combo Breaker]
+|https://github.com/paulBee/AdventOfKotlin/blob/master/src/main/kotlin/year2020/day25.kt[Parts 1 & 2]
 |===
