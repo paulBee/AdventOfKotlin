@@ -2,7 +2,6 @@ package utils.collections
 
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.toPersistentList
-import utils.hof.firstArg
 
 //List fun
 /**
@@ -44,6 +43,8 @@ fun <T> Sequence<T>.takeWhileInclusive(pred: (T) -> Boolean): Sequence<T> {
         shouldSContinue
     }
 }
+
+fun <T> List<T>.takeWhileInclusive(pred: (T) -> Boolean): List<T> = this.asSequence().takeWhileInclusive(pred).toList()
 
 fun <T> Sequence<T>.untilStable(): T =
     this.zipWithNext()
@@ -94,3 +95,19 @@ fun <K,V> Map<K, List<V>>.occurrencesOf(number: K) = this[number]?.size ?: 0
 
 fun <T> PersistentList<T>.dropP(amount: Int): PersistentList<T> = this.drop(amount).toPersistentList()
 fun <T> List<T>.takeP(amount: Int) = this.take(amount).toPersistentList()
+
+fun <T> List<T>.windowedWithTail(windowSize: Int): Sequence<Pair<List<T>, List<T>>> {
+    var list = this.toPersistentList()
+    return sequence { while(list.size >= windowSize) {
+        yield(list.takeP(windowSize) to list.dropP(windowSize))
+        list = list.dropP(1)
+    } }
+}
+
+val <E> Collection<E>.arrangements: List<List<E>>
+    get() {
+        return when (this.size) {
+            1 -> listOf(this.toList())
+            else -> this.flatMap { x -> (this - x).arrangements.map { listOf(x) + it } }
+        }
+    }

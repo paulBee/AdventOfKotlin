@@ -11,6 +11,7 @@ data class Coordinate(val x : Int, val y : Int) {
         generateSequence(this) { direction.moveFrom(it) }.elementAt(it)
 
     fun move(dx: Int, dy: Int) = Coordinate(x + dx, y + dy)
+    fun move(direction: Direction) = moveDistance(direction, 1)
 
     fun rotate(rotate: Rotation) =
         when (rotate) {
@@ -26,7 +27,10 @@ data class Coordinate(val x : Int, val y : Int) {
 
     fun follow(direction: DirectionRatio) = move(direction.deltaX, direction.deltaY)
 
-    fun allAdjacent(): List<Coordinate> = orthogonalDirections.map { it.moveFrom(this) }
+    fun allAdjacent(): List<Coordinate> = orthognals
+
+    val orthognals by lazy { orthogonalDirections.map { it.moveFrom(this) } }
+    val diagonals by lazy { diagonalDirections.map { it.moveFrom(this) } }
 
 }
 

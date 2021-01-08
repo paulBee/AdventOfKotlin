@@ -1,5 +1,6 @@
 package utils.strings
 
+import utils.hof.oneOf
 import kotlin.math.pow
 
 /**
@@ -38,4 +39,11 @@ fun String.toLetterAndNumber(): Pair<String, Int> {
     return letter to distance.toInt()
 }
 
-fun String.isNumber() = this.all { it.isDigit() }
+fun String.isNumber() =
+    if (this[0] == '-') {
+        this.drop(1).all { it.isDigit() }
+    } else {
+        this.all { it.isDigit() }
+    }
+
+fun Char.isVowel() = oneOf('a', 'e', 'i', 'o', 'u')(this.toLowerCase())
