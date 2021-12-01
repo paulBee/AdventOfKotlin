@@ -4,7 +4,9 @@ import java.io.File
 import java.io.Serializable
 import kotlin.random.Random
 
-fun readLinesFromFile(fileName: String): List<String> = readFile(fileName).readLines()
+fun readLinesFromFile(fileName: String) = readLinesFromFile(fileName) { it }
+
+fun <T>readLinesFromFile(fileName: String, mapper: (String) -> T): List<T> = readFile(fileName).readLines().map(mapper)
 
 fun readTextFromFile(fileName: String): String = readFile(fileName).readText()
 

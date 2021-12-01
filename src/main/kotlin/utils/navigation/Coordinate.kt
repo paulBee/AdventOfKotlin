@@ -32,6 +32,9 @@ data class Coordinate(val x : Int, val y : Int) {
     val orthognals by lazy { orthogonalDirections.map { it.moveFrom(this) } }
     val diagonals by lazy { diagonalDirections.map { it.moveFrom(this) } }
 
+    companion object {
+        fun at(x: Int, y: Int): Coordinate = Coordinate(x, y)
+    }
 }
 
 val theOrigin = Coordinate(0, 0)

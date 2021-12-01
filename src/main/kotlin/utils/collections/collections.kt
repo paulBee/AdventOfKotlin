@@ -111,3 +111,21 @@ val <E> Collection<E>.arrangements: List<List<E>>
             else -> this.flatMap { x -> (this - x).arrangements.map { listOf(x) + it } }
         }
     }
+
+fun <E> Collection<E>.modalEntry() = this.groupBy { it }.entries.maxBy { it.value.size }!!.key
+
+fun <E> List<E>.firstDuplicate(): E? {
+    this.scan(emptyList<E>()) { acc, next ->
+        if (acc.contains(next)) return next
+        acc + next
+    }
+    return null
+}
+
+fun List<Number>.windowAverage(windowSize: Int) =
+    this.windowed(windowSize)
+        .map { window -> window.sumOf { it.toDouble() } / windowSize }
+
+fun <T>List<T>.pairedWithNext(): List<Pair<T, T>> =
+    this.windowed(2)
+        .map { Pair(it[0], it[1]) }

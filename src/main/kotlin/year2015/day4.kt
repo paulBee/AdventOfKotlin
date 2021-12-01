@@ -3,6 +3,7 @@ package year2015
 import utils.aoc.displayPart1
 import utils.aoc.displayPart2
 import utils.collections.takeWhileInclusive
+import utils.strings.md5
 import java.math.BigInteger
 import java.security.MessageDigest
 
@@ -13,9 +14,3 @@ fun main() {
 }
 
 val sequence = generateSequence(1) { it + 1 }.map { "yzbqklnj$it" }
-
-private fun String.md5(): String {
-    val digest = MessageDigest.getInstance("MD5").digest(this.toByteArray(Charsets.UTF_8))
-    val hexMd5 = BigInteger(1, digest).toString(16)
-    return hexMd5.padStart(32, '0')
-}

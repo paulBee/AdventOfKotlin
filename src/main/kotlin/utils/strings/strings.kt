@@ -1,6 +1,8 @@
 package utils.strings
 
 import utils.hof.oneOf
+import java.math.BigInteger
+import java.security.MessageDigest
 import kotlin.math.pow
 
 /**
@@ -46,4 +48,17 @@ fun String.isNumber() =
         this.all { it.isDigit() }
     }
 
+fun String.md5(): String {
+    val digest = MessageDigest.getInstance("MD5").digest(this.toByteArray(Charsets.UTF_8))
+    val hexMd5 = BigInteger(1, digest).toString(16)
+    return hexMd5.padStart(32, '0')
+}
+
 fun Char.isVowel() = oneOf('a', 'e', 'i', 'o', 'u')(this.toLowerCase())
+
+fun Char.shift() = when (this) {
+    'z' -> 'a'
+    else -> this + 1
+}
+
+fun Char.shift(number: Int) = generateSequence(this) { it.shift() }.elementAt(number)

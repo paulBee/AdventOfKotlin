@@ -2,7 +2,7 @@ package utils.navigation
 
 import Circular
 
-sealed class Direction: Circular<Direction>, CoordinateMove {}
+sealed class Direction: Circular<Direction>, CoordinateMove
 
 interface CoordinateMove {
     fun deltaX() = 0
@@ -71,6 +71,7 @@ val diagonalDirections = listOf(UpRightDiagonal, UpLeftDiagonal, DownRightDiagon
 
 val orthogonalDirections = listOf(Up, Down, Left, Right)
 
+fun Char.toDirection() = this.toString().toDirection()
 fun String.toDirection() : Direction =
     when (this) {
         "U" -> Up
