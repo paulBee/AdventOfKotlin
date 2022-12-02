@@ -7,24 +7,23 @@ fun main() {
 
     val input = readLinesFromFile("2022/day2.txt")
 
-    input.sumOf{ line -> score(line, ::chooseMoveStrategy) }
+    input.sumOf(scoreChoosingMove)
         .also(::println)
 
-    input.sumOf { line -> score(line, ::chooseResultStrategy) }
+    input.sumOf(scoreChoosingResult)
         .also(::println)
 }
 
-fun chooseMoveStrategy(instruction: String, elfMove: RPSMove) = instruction.toMove()
-fun chooseResultStrategy(instruction: String, elfMove: RPSMove) = instruction.toResult().pickMove(elfMove)
+val scoreChoosingMove = scoreWithStrategy { i, _ -> i.toMove() }
+val scoreChoosingResult = scoreWithStrategy { i, elfMove -> i.toResult().pickMove(elfMove) }
 
-fun score(line: String, strategy: (instruction: String, elfMove: RPSMove) -> RPSMove): Int {
-
-    val (first, second) = line.split(" ")
-    val elfMove = first.toMove()
-    val myMove = strategy(second, elfMove)
-
-    return myMove.play(elfMove).score + myMove.score
-
+fun scoreWithStrategy(strategy: (instruction: String, elfMove: RPSMove) -> RPSMove): (String) -> Int {
+    return { line ->
+        val (first, second) = line.split(" ")
+        val elfMove = first.toMove()
+        val myMove = strategy(second, elfMove)
+        myMove.play(elfMove).score + myMove.score
+    }
 }
 
 enum class RPSMove(val score: Int) {
