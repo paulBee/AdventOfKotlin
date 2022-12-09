@@ -11,6 +11,9 @@ fun main() {
     println(ropeSegmentPaths.elementAt(1).toSet().size)
     println(ropeSegmentPaths.elementAt(9).toSet().size)
 
+
+    println("rope needs to be ${ropeSegmentPaths.takeWhile { it.toSet().size > 1 }.count()} segments long before the tail doesnt move")
+
 }
 
 fun dragNextSegment(headPath: Sequence<Coordinate>): Sequence<Coordinate> {
