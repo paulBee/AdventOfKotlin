@@ -71,6 +71,7 @@ val diagonalDirections = listOf(UpRightDiagonal, UpLeftDiagonal, DownRightDiagon
 
 val orthogonalDirections = listOf(Up, Down, Left, Right)
 
+fun orthogonalSequences(coordinate: Coordinate) = orthogonalDirections.map { it.sequenceFrom(coordinate).drop(1) }
 fun Char.toDirection() = this.toString().toDirection()
 fun String.toDirection() : Direction =
     when (this) {
