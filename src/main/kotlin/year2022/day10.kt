@@ -5,13 +5,12 @@ import utils.aoc.readLinesFromFile
 fun main() {
 
     val register = registerSequence(readLinesFromFile("2022/day10.txt"))
-    val clockAndRegister = clockSequence().zip(register)
 
-    val signalStrength = clockAndRegister.map { (c, r) -> c * r }
+    val signalStrength = clockSequence().zip(register).map { (c, r) -> c * r }
     (20..220 step 40).sumOf { signalStrength.elementAt(it - 1) }.also { println(it) }
 
+    // part 2
     val spritePosition = register.map { listOf(it - 1, it, it + 1) }
-
     val pixels = pixelSequence().zip(spritePosition)
         .map { (pix, spr) -> if (spr.contains(pix))'#' else '.' }
 
