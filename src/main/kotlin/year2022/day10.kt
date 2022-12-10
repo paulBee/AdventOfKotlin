@@ -11,10 +11,10 @@ fun main() {
 
     // part 2
     val spritePosition = register.map { listOf(it - 1, it, it + 1) }
-    val pixels = pixelSequence().zip(spritePosition)
-        .map { (pix, spr) -> if (spr.contains(pix))'#' else '.' }
 
-    pixels.chunked(40).forEach { println(it.joinToString("")) }
+    pixelSequence().zip(spritePosition)
+        .map { (pix, spr) -> if (spr.contains(pix)) '#' else '.' }
+        .chunked(40).forEach { println(it.joinToString("")) }
 
 }
 
