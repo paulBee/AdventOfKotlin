@@ -105,22 +105,17 @@ private fun List<String>.toMonkey(monkeys: List<Monkey>): Monkey {
     val nameLine = this.first()
     val (itemLine, operationLine, divisionLine, trueLine, falseLine) = this.drop(1) // kotlin strings dont have a component6 function :D
 
-    val (a, operand, b) = operationLine.split(" = ")[1].split(" ")
+    val (operand, b) = operationLine.split(" = old ")[1].split(" ")
 
-    val operation: Operation = { old ->
-        listOf(parseArg(a, old), parseArg(b, old))
-            .let {
-                when (operand) {
-                    "+" -> it.sum()
-                    "*" -> it.multiply()
-                    else -> throw RuntimeException("Fancy Maths detected")
-                }
-            }
+    val op = when (operand) {
+        "+" -> add
+        "*" -> multiply
+        else -> throw RuntimeException("Fancy Maths detected")
     }
 
     return Monkey(
         nameLine.split(" ")[1].dropLast(1).toInt(),
-        operation,
+        { old -> op(old, parseArg(b, old)) },
         divisionLine.split(" by ")[1].toInt(),
         { monkeys[trueLine.split(" ").last().toInt()] },
         { monkeys[falseLine.split(" ").last().toInt()] },
@@ -132,3 +127,5 @@ private fun parseArg(a: String, old: Long) = if (a == "old") old else a.toLong()
 
 typealias Operation = (Long) -> Long
 
+val add = { a: Long, b: Long -> a + b }
+val multiply = { a: Long, b: Long -> a * b }
