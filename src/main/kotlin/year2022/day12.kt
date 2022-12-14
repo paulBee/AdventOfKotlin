@@ -19,6 +19,10 @@ fun main() {
     upwardsPathFinder(startLocation, Location::isBestTransmissionSpot).also { println(it.size - 1) }
     downwardsPathFinder(endLocation, Location::isLowestPoint).also { println(it.size - 1) }
 
+
+    // thought I'd work through a* for some practice
+    astar(locations)?.also { println(it.size - 1) }
+
 }
 
 fun Location.isBestTransmissionSpot() = this.isEnd
@@ -79,3 +83,53 @@ data class Location(val coordinate: Coordinate, val elevation: Int, val isStart:
 typealias ShortestPathFromTo = (startLocation: Location, targetCheck: (Location) -> Boolean) -> Path
 typealias ValidTraversals = (location: Location) -> List<Location>
 typealias Path = PersistentList<Location>
+
+
+
+
+// a*
+
+fun astar(locations: Map<Coordinate, Location>): List<Location>? {
+    val startLocation = locations.values.first { it.isStart }
+    val endLocation = locations.values.first { it.isEnd }
+
+    val neighbours = locations.upwardsTraversal()
+
+    val openList = mutableListOf(AStar(startLocation, null, endLocation.heuristic(startLocation)))
+    val closedList = mutableListOf<AStar>()
+
+    while (openList.isNotEmpty()){
+
+        openList.sortBy { it.cost() }
+        val currentNode = openList.removeFirst()
+        closedList.add(currentNode)
+
+        neighbours(currentNode.location)
+            .filter { n -> closedList.none { it.location == n }}
+            .forEach { neighbour ->
+                if (neighbour.isEnd) {
+                    return currentNode.toPath() + neighbour
+                }
+                val previous = openList.firstOrNull { it.location == neighbour }
+                if (previous == null) {
+                    openList.add(AStar(neighbour, currentNode, endLocation.heuristic(startLocation)))
+                } else if (previous.distance() > currentNode.distance() + 1) {
+                    previous.parent = currentNode
+                }
+            }
+    }
+
+    return null
+}
+
+private fun Location.heuristic(location: Location) = this.coordinate.manhattanDistanceTo(location.coordinate)
+
+data class AStar(
+    val location: Location,
+    var parent: AStar?,
+    val heuristic: Int,
+) {
+    fun distance(): Int =  1 + (parent?.distance() ?: -1)
+    fun cost() = distance() + heuristic
+    fun toPath(): List<Location> = listOf(location) + (parent?.toPath() ?: emptyList())
+}

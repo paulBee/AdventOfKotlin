@@ -1,6 +1,7 @@
 package utils.navigation
 
 import utils.algorithm.highestCommonFactor
+import java.lang.IllegalArgumentException
 import java.lang.IllegalStateException
 import java.lang.StringBuilder
 import kotlin.math.abs
@@ -34,6 +35,26 @@ data class Coordinate(val x : Int, val y : Int) {
 
     companion object {
         fun at(x: Int, y: Int): Coordinate = Coordinate(x, y)
+        fun at(x: String, y: String): Coordinate = at(x.toInt(), y.toInt())
+
+        fun of(string: String) = string
+            .split(",")
+            .map { it.trim() }
+            .let { (x, y) -> at(x, y) }
+        fun of(input: Pair<String, String>) = at (input.first, input.second)
+    }
+
+    fun coordsBetween(other: Coordinate): Sequence<Coordinate> {
+
+        return if (this.x == other.x) {
+            val (higher, lower) = listOf(this, other).sortedBy { it.y }
+            Down.sequenceFrom(higher).take((lower.y - higher.y) + 1)
+        } else if (this.y == other.y) {
+            val (left, right) = listOf(this, other).sortedBy { it.x }
+            Right.sequenceFrom(left).take((right.x - left.x) + 1 )
+        } else {
+            throw IllegalArgumentException("Can only produce straight lines")
+        }
     }
 }
 
@@ -66,6 +87,22 @@ fun Map<Coordinate, Any>.gridToString(): String {
     val sb = StringBuilder()
 
     (0..maxY).forEach { y -> sb.append((0..maxX).joinToString("") { x -> this[Coordinate(x, y)]?.toString() ?: "" }) }
+    sb.append("\n")
+
+    return sb.toString()
+}
+
+fun <T> Map<Coordinate, T>.gridToString(stringify: (T?) -> String): String {
+    val maxX: Int = this.keys.maxOfOrNull { (x) -> x } ?: 0
+    val minX: Int = this.keys.minOfOrNull { (x) -> x } ?: 0
+    val maxY: Int = this.keys.maxOfOrNull { (_, y) -> y } ?: 0
+    val minY: Int = this.keys.minOfOrNull { (_, y) -> y } ?: 0
+
+    val sb = StringBuilder()
+
+    sb.append("Top Left Coord == ($minX,$minY)\n\n\n")
+
+    (minY..maxY).forEach { y -> sb.append((minX..maxX).joinToString("") { x -> stringify(this[Coordinate(x, y)]) }).append("\n") }
     sb.append("\n")
 
     return sb.toString()

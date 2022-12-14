@@ -46,10 +46,12 @@ fun <T> Sequence<T>.takeWhileInclusive(pred: (T) -> Boolean): Sequence<T> {
 
 fun <T> List<T>.takeWhileInclusive(pred: (T) -> Boolean): List<T> = this.asSequence().takeWhileInclusive(pred).toList()
 
-fun <T> Sequence<T>.untilStable(): T =
+fun <T> Sequence<T>.untilStable(): T = this.takeUntilStable().last()
+
+fun <T> Sequence<T>.takeUntilStable(): Sequence<T> =
     this.zipWithNext()
         .takeWhileInclusive { (a, b) -> a != b }
-        .last().let { (it, _) -> it }
+        .map { (it, _) -> it }
 
 /**
  * produces the product of a list of numbers, converts them to Long to reduce overflow issues
